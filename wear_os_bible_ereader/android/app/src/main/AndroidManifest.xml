@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.verygoodcore.wear_os_bible_ereader">
+    <uses-feature android:name="android.hardware.type.watch" />
    <application
         android:label="wear_os_bible_ereader"
         android:name="${applicationName}"
@@ -31,4 +32,7 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
+    <meta-data
+   android:name="com.google.android.wearable.standalone"
+   android:value="true" />
 </manifest>
