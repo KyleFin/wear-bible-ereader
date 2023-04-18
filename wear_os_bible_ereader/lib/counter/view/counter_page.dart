@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wear_os_bible_ereader/counter/counter.dart';
+import 'package:wear_os_bible_ereader/epub/epub.dart';
 import 'package:wear_os_bible_ereader/l10n/l10n.dart';
 
 class CounterPage extends StatelessWidget {
@@ -20,27 +21,30 @@ class CounterView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    return Scaffold(
-      body: SizedBox.expand(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: () => context.read<CounterCubit>().increment(),
-              child: const Icon(Icons.add),
-            ),
-            const SizedBox(height: 10),
-            Text(l10n.counterAppBarTitle),
-            const CounterText(),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () => context.read<CounterCubit>().decrement(),
-              child: const Icon(Icons.remove),
-            ),
-          ],
-        ),
+    // final l10n = context.l10n;
+    return const Scaffold(
+      body: EpubWidget(
+        filename: 'bofm.epub',
       ),
+      // SizedBox.expand(
+      //   child: Column(
+      //     mainAxisAlignment: MainAxisAlignment.center,
+      //     children: [
+      //       ElevatedButton(
+      //         onPressed: () => context.read<CounterCubit>().increment(),
+      //         child: const Icon(Icons.add),
+      //       ),
+      //       const SizedBox(height: 10),
+      //       Text(l10n.counterAppBarTitle),
+      //       const CounterText(),
+      //       const SizedBox(height: 10),
+      //       ElevatedButton(
+      //         onPressed: () => context.read<CounterCubit>().decrement(),
+      //         child: const Icon(Icons.remove),
+      //       ),
+      //     ],
+      //   ),
+      // ),
     );
   }
 }
