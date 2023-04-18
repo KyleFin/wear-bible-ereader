@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wear_os_bible_ereader/counter/counter.dart';
+import 'package:wear_os_bible_ereader/epub/epub.dart';
 import 'package:wear_os_bible_ereader/l10n/l10n.dart';
 
 class App extends StatelessWidget {
@@ -21,7 +22,7 @@ class App extends StatelessWidget {
       ),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: const CounterPage(),
+      home: const EpubWidget(), // CounterPage(),
     );
   }
 }

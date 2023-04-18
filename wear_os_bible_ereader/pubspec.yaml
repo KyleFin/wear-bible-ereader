@@ -8,6 +8,7 @@ environment:
 
 dependencies:
   bloc: ^8.1.1
+  epub_view: ^3.0.0
   flutter:
     sdk: flutter
   flutter_bloc: ^8.1.2
@@ -25,5 +26,7 @@ dev_dependencies:
   very_good_analysis: ^4.0.0
 
 flutter:
+  assets:
+    - assets/
   uses-material-design: true
   generate: true
