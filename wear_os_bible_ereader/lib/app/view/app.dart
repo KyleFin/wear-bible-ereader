@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:wear_os_bible_ereader/counter/counter.dart';
-import 'package:wear_os_bible_ereader/epub/epub.dart';
 import 'package:wear_os_bible_ereader/l10n/l10n.dart';
 
 class App extends StatelessWidget {
@@ -14,15 +13,13 @@ class App extends StatelessWidget {
         useMaterial3: true,
         colorScheme: const ColorScheme.dark(
           // dark colorscheme
-          primary: Colors.white24,
-          onBackground: Colors.white10,
-          onSurface: Colors.white10,
+          primary: Colors.white,
         ),
         appBarTheme: const AppBarTheme(color: Color(0xFF13B9FF)),
       ),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: const EpubWidget(), // CounterPage(),
+      home: const CounterPage(),
     );
   }
 }

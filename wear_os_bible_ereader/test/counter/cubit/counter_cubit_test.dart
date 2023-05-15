@@ -6,19 +6,19 @@ import 'package:wear_os_bible_ereader/counter/counter.dart';
 void main() {
   group('CounterCubit', () {
     test('initial state is 0', () {
-      expect(CounterCubit().state, equals(0));
+      expect(PositionCubit().state, equals(0));
     });
 
-    blocTest<CounterCubit, int>(
+    blocTest<PositionCubit, int>(
       'emits [1] when increment is called',
-      build: CounterCubit.new,
+      build: PositionCubit.new,
       act: (cubit) => cubit.increment(),
       expect: () => [equals(1)],
     );
 
-    blocTest<CounterCubit, int>(
+    blocTest<PositionCubit, int>(
       'emits [-1] when decrement is called',
-      build: CounterCubit.new,
+      build: PositionCubit.new,
       act: (cubit) => cubit.decrement(),
       expect: () => [equals(-1)],
     );
