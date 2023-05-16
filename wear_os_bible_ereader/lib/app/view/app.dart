@@ -115,18 +115,60 @@ class BookDetailsPage extends StatelessWidget {
         appBar: AppBar(title: const Text('Details')),
         body: Padding(
           padding: const EdgeInsets.all(8),
-          child: EpubView(
-            //TableOfContents(
-            controller: epubController,
-            // itemBuilder: (context, index, chapter, itemCount) =>
-            //     chapter.type == 'chapter'
-            //         ? ListTile(
-            //             title: Text(chapter.title!.trim()),
-            //             onTap: () =>
-            //                 epubController.scrollTo(index: chapter.startIndex),
-            //           )
-            //         : const SizedBox.shrink(),
+          child:
+              // TODO: Figure out why this code (copied from EpubViewTableOfContents)
+              // doesn't get past loading spinner but changing to EpubView then back
+              // while running app gets it to work.
+              ValueListenableBuilder(
+            valueListenable: epubController.tableOfContentsListenable,
+            builder: (_, data, child) {
+              Widget content;
+
+              if (data.isNotEmpty) {
+                content = ListView.builder(
+                  // padding: padding,
+                  key: Key('$runtimeType.content'),
+                  itemBuilder: (context, index) {
+                    final chapter = data[index];
+                    // TODO: check cubit selection to decide what to display
+                    return chapter.type == 'chapter'
+                        ? ListTile(
+                            title: Text(chapter.title!.trim()),
+                            onTap: () => epubController.scrollTo(
+                                index: chapter.startIndex),
+                          )
+                        : const SizedBox.shrink();
+                  },
+                  itemCount: data.length,
+                );
+              } else {
+                content = KeyedSubtree(
+                  key: Key('$runtimeType.loader'),
+                  child: const Center(child: CircularProgressIndicator()),
+                );
+              }
+
+              return AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                transitionBuilder:
+                    (Widget child, Animation<double> animation) =>
+                        FadeTransition(opacity: animation, child: child),
+                child: content,
+              );
+            },
           ),
+          //  EpubView(
+          //   //TableOfContents(
+          //   controller: epubController,
+          //   // itemBuilder: (context, index, chapter, itemCount) =>
+          //   //     chapter.type == 'chapter'
+          //   //         ? ListTile(
+          //   //             title: Text(chapter.title!.trim()),
+          //   //             onTap: () =>
+          //   //                 epubController.scrollTo(index: chapter.startIndex),
+          //   //           )
+          //   //         : const SizedBox.shrink(),
+          // ),
         ),
       ),
     );
