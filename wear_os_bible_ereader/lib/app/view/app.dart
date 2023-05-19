@@ -18,7 +18,7 @@ class _AppState extends State<App> {
     return [
       BookshelfPage.page(),
       if (selectedBook != null)
-        BookDetailsPage.page(epubController: _epubReaderController)
+        BookDetailsPage.page(epubController: _epubReaderController),
     ];
   }
 
@@ -48,10 +48,7 @@ class _AppState extends State<App> {
       theme: ThemeData(
         visualDensity: VisualDensity.compact,
         useMaterial3: true,
-        colorScheme: const ColorScheme.dark(
-          // dark colorscheme
-          primary: Colors.white,
-        ),
+        colorScheme: const ColorScheme.dark(primary: Colors.white),
         appBarTheme: const AppBarTheme(color: Color(0xFF13B9FF)),
       ),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -59,28 +56,29 @@ class _AppState extends State<App> {
       home: BlocListener<PositionCubit, PositionCubitState>(
         listenWhen: (previous, current) {
           final currBookFilename = titleToFilename[current.bookTitle];
-          return currBookFilename != null &&
+          final openNewBookRequired = currBookFilename != null &&
               // TODO Verify with tests (did with breakpoints).
               // Only change controller if opening a different book.
               currBookFilename != current.latestBook;
+          final scrollToNewLocationRequired =
+              previous.chapterIndex != current.chapterIndex;
+          return openNewBookRequired || scrollToNewLocationRequired;
         },
         listener: (context, state) {
+          if (state.chapterIndex != null) {
+            _epubReaderController.scrollTo(index: state.chapterIndex!);
+          }
+
           final bookFilename = titleToFilename[state.bookTitle]!;
-          context.read<PositionCubit>().setLatestBook(bookFilename);
-          _epubReaderController.dispose();
-          _epubReaderController = EpubController(
-            document: EpubDocument.openAsset(
-              'assets/$bookFilename',
-            ),
-          );
-          // ..loadingState.addListener(() {
-          //     context.read<PositionCubit>().setBookIsLoading(
-          //           _epubReaderController.loadingState.value ==
-          //               EpubViewLoadingState.loading,
-          //         );
-          //   });
-          // final cubit = context.read<PositionCubit>()..setBookIsLoading(true);
-          // _epubReaderController.;
+          if (bookFilename != state.latestBook) {
+            context.read<PositionCubit>().setLatestBook(bookFilename);
+            _epubReaderController.dispose();
+            _epubReaderController = EpubController(
+              document: EpubDocument.openAsset(
+                'assets/$bookFilename',
+              ),
+            );
+          }
         },
         child: FlowBuilder(
           state: context.watch<PositionCubit>().state,
@@ -112,65 +110,81 @@ class BookDetailsPage extends StatelessWidget {
         return true;
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text('Details')),
-        body: Padding(
-          padding: const EdgeInsets.all(8),
-          child:
-              // TODO: Figure out why this code (copied from EpubViewTableOfContents)
-              // doesn't get past loading spinner but changing to EpubView then back
-              // while running app gets it to work.
-              ValueListenableBuilder(
-            valueListenable: epubController.tableOfContentsListenable,
-            builder: (_, data, child) {
-              Widget content;
+          appBar: AppBar(title: const Text('Details')),
+          body: Padding(
+            padding: const EdgeInsets.all(8),
+            child:
+                // TODO: Figure out why this code (copied from EpubViewTableOfContents)
+                // doesn't get past loading spinner but changing to EpubView then back
+                // while running app gets it to work.
+                // MAY BE EASIER to get (sub)chapters directly from controller.document
+                // instead of tableOfContentsListenable. (Looks like that may be
+                // nicer for names and numSubchapters but may not have indices needed
+                // for scrollTo)
+                BlocBuilder<PositionCubit, PositionCubitState>(
+              builder: (context, state) {
+                return Stack(
+                  children: [
+                    //   ValueListenableBuilder(
+                    // valueListenable: epubController.tableOfContentsListenable,
+                    // builder: (_, data, child) {
+                    //   Widget content;
 
-              if (data.isNotEmpty) {
-                content = ListView.builder(
-                  // padding: padding,
-                  key: Key('$runtimeType.content'),
-                  itemBuilder: (context, index) {
-                    final chapter = data[index];
-                    // TODO: check cubit selection to decide what to display
-                    return chapter.type == 'chapter'
-                        ? ListTile(
-                            title: Text(chapter.title!.trim()),
-                            onTap: () => epubController.scrollTo(
-                                index: chapter.startIndex),
-                          )
-                        : const SizedBox.shrink();
-                  },
-                  itemCount: data.length,
-                );
-              } else {
-                content = KeyedSubtree(
-                  key: Key('$runtimeType.loader'),
-                  child: const Center(child: CircularProgressIndicator()),
-                );
-              }
+                    //   if (data.isNotEmpty) {
+                    //     content = ListView.builder(
+                    //       // padding: padding,
+                    //       key: Key('$runtimeType.content'),
+                    //       itemBuilder: (context, index) {
+                    //         final chapter = data[index];
+                    //         // TODO: check cubit selection to decide what to display
+                    //         return chapter.type == 'chapter'
+                    //             ? ListTile(
+                    //                 title: Text(chapter.title!.trim()),
+                    //                 onTap: () => epubController.scrollTo(
+                    //                     index: chapter.startIndex),
+                    //               )
+                    //             : const SizedBox.shrink();
+                    //       },
+                    //       itemCount: data.length,
+                    //     );
+                    //   } else {
+                    //     content = KeyedSubtree(
+                    //       key: Key('$runtimeType.loader'),
+                    //       child: const Center(child: CircularProgressIndicator()),
+                    //     );
+                    //   }
 
-              return AnimatedSwitcher(
-                duration: const Duration(milliseconds: 250),
-                transitionBuilder:
-                    (Widget child, Animation<double> animation) =>
-                        FadeTransition(opacity: animation, child: child),
-                child: content,
-              );
-            },
-          ),
-          //  EpubView(
-          //   //TableOfContents(
-          //   controller: epubController,
-          //   // itemBuilder: (context, index, chapter, itemCount) =>
-          //   //     chapter.type == 'chapter'
-          //   //         ? ListTile(
-          //   //             title: Text(chapter.title!.trim()),
-          //   //             onTap: () =>
-          //   //                 epubController.scrollTo(index: chapter.startIndex),
-          //   //           )
-          //   //         : const SizedBox.shrink(),
-          // ),
-        ),
-      ),
+                    //   return AnimatedSwitcher(
+                    //     duration: const Duration(milliseconds: 250),
+                    //     transitionBuilder:
+                    //         (Widget child, Animation<double> animation) =>
+                    //             FadeTransition(opacity: animation, child: child),
+                    //     child: content,
+                    //   );
+                    // },
+                    // ),
+                    EpubView(controller: epubController),
+                    if (state.chapterIndex == null) ...[
+                      Container(color: Colors.black),
+                      EpubViewTableOfContents(
+                          controller: epubController,
+                          itemBuilder: (context, index, chapter, itemCount) =>
+                              //     //     chapter.type == 'chapter'
+                              //     //         ?
+                              ListTile(
+                                title: Text(chapter.title!.trim()),
+                                onTap: () => context
+                                    .read<PositionCubit>()
+                                    .selectChapter(chapter.startIndex),
+                              )
+                          //         : const SizedBox.shrink(),
+                          ),
+                    ],
+                  ],
+                );
+              },
+            ),
+          )),
     );
   }
 }

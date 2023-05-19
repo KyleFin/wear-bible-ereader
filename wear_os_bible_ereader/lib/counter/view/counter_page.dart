@@ -22,15 +22,15 @@ class BookshelfPage extends StatelessWidget {
       body: ListView(
         // mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          Text(l10n.libraryAppBarTitle),
+          const SizedBox(height: 10),
           for (final k in titleToFilename.keys)
             ElevatedButton(
               onPressed: () => cubit.openBook(k),
               child: Text(k),
             ),
-          const SizedBox(height: 10),
-          Text(l10n.libraryAppBarTitle),
-          const CounterText(),
-          const SizedBox(height: 10),
+          // const CounterText(),
+          // const SizedBox(height: 10),
         ],
         // ),
         // : state.bookIsLoading
