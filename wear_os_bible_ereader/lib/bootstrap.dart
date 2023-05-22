@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:bloc/bloc.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wear_os_bible_ereader/counter/counter.dart';
 
 class AppBlocObserver extends BlocObserver {
   const AppBlocObserver();
@@ -28,7 +29,12 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
   Bloc.observer = const AppBlocObserver();
 
   await runZonedGuarded(
-    () async => runApp(await builder()),
+    () async => runApp(
+      BlocProvider(
+        create: (_) => PositionCubit(),
+        child: await builder(),
+      ),
+    ),
     (error, stackTrace) => log(error.toString(), stackTrace: stackTrace),
   );
 }

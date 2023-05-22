@@ -8,7 +8,7 @@ import 'package:wear_os_bible_ereader/counter/counter.dart';
 
 import '../../helpers/helpers.dart';
 
-class MockCounterCubit extends MockCubit<int> implements CounterCubit {}
+class MockCounterCubit extends MockCubit<int> implements PositionCubit {}
 
 void main() {
   group('CounterPage', () {
@@ -19,7 +19,7 @@ void main() {
   });
 
   group('CounterView', () {
-    late CounterCubit counterCubit;
+    late PositionCubit counterCubit;
 
     setUp(() {
       counterCubit = MockCounterCubit();
