@@ -7,7 +7,7 @@ class PositionCubitState extends Equatable {
     this.scriptureBookIndex,
     this.chapterIndex,
     this.epubCfi, {
-    required this.latestBook,
+    required this.latestBookFilename,
   });
 
   const PositionCubitState.initial()
@@ -16,14 +16,14 @@ class PositionCubitState extends Equatable {
           null,
           null,
           null,
-          latestBook: bibleFilename,
+          latestBookFilename: bibleFilename,
         );
 
   /// Latest epub file which was loaded in Epub controller.
   ///
   /// If user returns to root menu then goes back to the same book, we need not
   /// reload it.
-  final String latestBook;
+  final String latestBookFilename;
 
   final String? bookTitle;
 
@@ -39,9 +39,17 @@ class PositionCubitState extends Equatable {
   final String?
       epubCfi; // TODO make Map<String, String?> to store latest cfi for each epub file?
 
+  bool get latestBookIsScripture =>
+      latestBookFilename == bibleFilename || latestBookFilename == bofmFilename;
+
   @override
-  List<Object?> get props =>
-      [latestBook, bookTitle, scriptureBookIndex, chapterIndex, epubCfi];
+  List<Object?> get props => [
+        latestBookFilename,
+        bookTitle,
+        scriptureBookIndex,
+        chapterIndex,
+        epubCfi
+      ];
 }
 
 class PositionCubit extends Cubit<PositionCubitState> {
@@ -55,7 +63,7 @@ class PositionCubit extends Cubit<PositionCubitState> {
           null,
           null,
           null,
-          latestBook: state.latestBook,
+        latestBookFilename: state.latestBookFilename,
         ),
       );
   }
@@ -66,18 +74,52 @@ class PositionCubit extends Cubit<PositionCubitState> {
         null,
         null,
           null,
-        latestBook: state.latestBook,
+          latestBookFilename: state.latestBookFilename,
+        ),
+      );
+
+  /// Return to previous menu. Returned bool determines whether page should pop.
+  Future<bool> popMenu() async {
+    // if (state.epubCfi != null) {
+    //   await setEpubCfi(null);
+    //   return false;
+    // }
+    if (state.chapterIndex != null) {
+      emit(
+        PositionCubitState(
+          state.bookTitle,
+          state.scriptureBookIndex,
+          null,
+          null,
+          latestBookFilename: state.latestBookFilename,
+        ),
+      );
+      return false;
+    }
+    if (state.scriptureBookIndex != null) {
+      emit(
+        PositionCubitState(
+          state.bookTitle,
+          null,
+          null,
+          null,
+          latestBookFilename: state.latestBookFilename,
       ),
     );
+      return false;
+    }
+    await closeBook();
+    return true;
+  }
 
-  Future<void> setLatestBook(String filename) async {
+  Future<void> setLatestBookFilename(String filename) async {
     emit(
       PositionCubitState(
         state.bookTitle,
         state.scriptureBookIndex,
         state.chapterIndex,
         state.epubCfi,
-        latestBook: filename,
+        latestBookFilename: filename,
       ),
     );
   }
@@ -88,7 +130,7 @@ class PositionCubit extends Cubit<PositionCubitState> {
           index,
           null,
           null,
-          latestBook: state.latestBook,
+          latestBookFilename: state.latestBookFilename,
         ),
       );
 
@@ -99,7 +141,7 @@ class PositionCubit extends Cubit<PositionCubitState> {
           state.scriptureBookIndex,
           index,
           null,
-          latestBook: state.latestBook,
+          latestBookFilename: state.latestBookFilename,
         ),
       );
 
