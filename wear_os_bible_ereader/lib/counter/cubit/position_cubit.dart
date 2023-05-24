@@ -56,7 +56,7 @@ class PositionCubit extends Cubit<PositionCubitState> {
   PositionCubit() : super(const PositionCubitState.initial());
 
   Future<void> openBook(String title) async {
-    assert(titleToFilename.containsKey(title), 'Invalid book title');
+    // assert(titleToAssetFilename.containsKey(title), 'Invalid book title');
     emit(
         PositionCubitState(
         title,
@@ -162,7 +162,7 @@ const bibleFilename = 'kjvCh.epub';
 /// https://www.globalgreyebooks.com/book-of-mormon-ebook.html
 const bofmFilename = 'bofmGlobalGrey.epub';
 
-const titleToFilename = {
+const titleToAssetFilename = {
   oldTestament: bibleFilename,
   newTestament: bibleFilename,
   bookOfMormon: bofmFilename,

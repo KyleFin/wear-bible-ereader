@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:epub_view/epub_view.dart';
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
@@ -55,7 +57,10 @@ class _AppState extends State<App> {
       supportedLocales: AppLocalizations.supportedLocales,
       home: BlocListener<PositionCubit, PositionCubitState>(
         listenWhen: (previous, current) {
-          final currBookFilename = titleToFilename[current.bookTitle];
+          final title = current.bookTitle;
+          final currBookFilename = titleToAssetFilename.containsKey(title)
+              ? titleToAssetFilename[title]
+              : title;
           final openNewBookRequired = currBookFilename != null &&
               // TODO Verify with tests (did with breakpoints).
               // Only change controller if opening a different book.
@@ -69,14 +74,19 @@ class _AppState extends State<App> {
             _epubReaderController.scrollTo(index: state.chapterIndex!);
           }
 
-          final bookFilename = titleToFilename[state.bookTitle]!;
+          final title = state.bookTitle;
+          final bookIsAsset = titleToAssetFilename.containsKey(title);
+          final bookFilename =
+              bookIsAsset ? titleToAssetFilename[state.bookTitle]! : title!;
           if (bookFilename != state.latestBookFilename) {
             context.read<PositionCubit>().setLatestBookFilename(bookFilename);
             _epubReaderController.dispose();
             _epubReaderController = EpubController(
-              document: EpubDocument.openAsset(
-                'assets/$bookFilename',
-              ),
+              document: bookIsAsset
+                  ? EpubDocument.openAsset(
+                      'assets/$bookFilename',
+                    )
+                  : EpubDocument.openFile(File(bookFilename)),
             );
           }
         },
