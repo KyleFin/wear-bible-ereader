@@ -175,14 +175,11 @@ class ScriptureSelectionMenu extends StatelessWidget {
   final EpubController epubController;
 
   bool _shouldIncludeBook(String? bookTitle, int index) {
-    switch (bookTitle) {
-      case oldTestament:
-        return index < newTestamentStartingIndexInTableOfContents;
-      case newTestament:
-        return index >= newTestamentStartingIndexInTableOfContents;
-      default:
-        return true;
-    }
+    return switch (bookTitle) {
+      oldTestament => index < newTestamentStartingIndexInTableOfContents,
+      newTestament => index >= newTestamentStartingIndexInTableOfContents,
+      _ => true,
+    };
   }
 
   @override
