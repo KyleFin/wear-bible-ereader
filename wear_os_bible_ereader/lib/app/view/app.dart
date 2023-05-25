@@ -126,7 +126,7 @@ class BookDetailsPage extends StatelessWidget {
                   // if it's not visible).
                   EpubView(controller: epubController),
                   if (state.chapterIndex == null) ...[
-                    Container(color: Colors.black),
+                    Container(color: Theme.of(context).colorScheme.background),
                     TableOfContents(epubController: epubController),
                   ],
                 ],
