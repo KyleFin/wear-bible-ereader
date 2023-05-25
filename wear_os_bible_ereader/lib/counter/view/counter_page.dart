@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:epub_view/epub_view.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
@@ -24,33 +27,26 @@ class BookshelfPage extends StatelessWidget {
         children: [
           Text(l10n.libraryAppBarTitle),
           const SizedBox(height: 10),
-          for (final k in titleToFilename.keys)
+          for (final k in titleToAssetFilename.keys)
             ElevatedButton(
               onPressed: () => cubit.openBook(k),
               child: Text(k),
             ),
-          // const CounterText(),
-          // const SizedBox(height: 10),
+          ElevatedButton(
+            onPressed: () async {
+              final result = await FilePicker.platform.pickFiles(
+                type: FileType.custom,
+                allowedExtensions: ['epub'],
+              );
+
+              // The result will be null, if the user aborted the dialog
+              if (result != null) {
+                await cubit.openBook(result.files.first.path!);
+              }
+            },
+            child: const Text('Open file'),
+          ),
         ],
-        // ),
-        // : state.bookIsLoading
-        //     ? const Text('Loading')
-        //     :
-        //     // EpubViewTableOfContents()
-        //     ListView(
-        //         // mainAxisAlignment: MainAxisAlignment.center,
-        //         children: [
-        //           for (final c in cubit.chapters())
-        //             ElevatedButton(
-        //               onPressed: () => cubit.openBook(c),
-        //               child: Text(c),
-        //             ),
-        //           const SizedBox(height: 10),
-        //           Text(l10n.libraryAppBarTitle),
-        //           const CounterText(),
-        //           const SizedBox(height: 10),
-        //         ],
-        //       );
       ),
     );
   }
