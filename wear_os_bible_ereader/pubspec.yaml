@@ -14,9 +14,10 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_bloc: ^8.1.2
+  flutter_html: 3.0.0-alpha.3
   flutter_localizations:
     sdk: flutter
-  intl: ^0.17.0
+  intl: ^0.18.0
   wear: ^1.1.0
   wearable_rotary: ^2.0.0
 
@@ -25,7 +26,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   mocktail: ^0.3.0
-  very_good_analysis: ^4.0.0
+  very_good_analysis: ^5.0.0
 
 flutter:
   assets:
