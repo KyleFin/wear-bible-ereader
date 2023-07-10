@@ -26,6 +26,7 @@ class _AppState extends State<App> {
 
   @override
   void initState() {
+    super.initState();
     _epubReaderController = EpubController(
       document: EpubDocument.openAsset('assets/kjvCh.epub'),
       // epubCfi:
@@ -33,7 +34,6 @@ class _AppState extends State<App> {
       // epubCfi:
       //     'epubcfi(/6/6[chapter-2]!/4/2/1612)', // book_2.epub Chapter 16 paragraph 3
     );
-    super.initState();
   }
 
   @override
