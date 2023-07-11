@@ -13,6 +13,15 @@ class CounterCubit extends Cubit<int> {
   // final FlutterWearOsConnectivity connectivity;
   final BookshelfRepository bookshelfRepository;
 
+  Future<void> addBook(File f) async {
+    await bookshelfRepository.addBook(
+      title: 'Frankenstein',
+      path: '/frank',
+      file: f,
+    );
+    emit(state + 1);
+  }
+
   Future<void> increment() async {
     // final isSupported = await connectivity.isSupported();
     // print(isSupported);

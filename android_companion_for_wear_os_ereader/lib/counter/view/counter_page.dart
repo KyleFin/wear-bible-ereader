@@ -1,9 +1,11 @@
+import 'dart:io';
+
 import 'package:android_companion_for_wear_os_ereader/counter/counter.dart';
 import 'package:android_companion_for_wear_os_ereader/l10n/l10n.dart';
 import 'package:bookshelf_repository/bookshelf_repository.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_wear_os_connectivity/flutter_wear_os_connectivity.dart';
 
 class CounterPage extends StatelessWidget {
   const CounterPage({super.key});
@@ -25,7 +27,29 @@ class CounterView extends StatelessWidget {
     final l10n = context.l10n;
     return Scaffold(
       appBar: AppBar(title: Text(l10n.counterAppBarTitle)),
-      body: const Center(child: CounterText()),
+      body: Center(
+        child: Column(
+          children: [
+            const CounterText(),
+            ElevatedButton(
+              onPressed: () async {
+                final result = await FilePicker.platform.pickFiles(
+                  type: FileType.custom,
+                  allowedExtensions: ['epub'],
+                );
+
+                // The result will be null, if the user aborted the dialog
+                if (result != null) {
+                  await context
+                      .read<CounterCubit>()
+                      .addBook(File(result.files.first.path!));
+                }
+              },
+              child: const Text('Open file'),
+            ),
+          ],
+        ),
+      ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.end,
