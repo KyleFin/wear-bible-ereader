@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:bookshelf_repository/bookshelf_repository.dart';
 import 'package:equatable/equatable.dart';
 
 class PositionCubitState extends Equatable {
@@ -6,7 +7,8 @@ class PositionCubitState extends Equatable {
     this.bookTitle,
     this.scriptureBookIndex,
     this.chapterIndex,
-    this.epubCfi, {
+    this.epubCfi,
+    this.titlesFromCompanion, {
     required this.latestBookFilename,
   });
 
@@ -16,6 +18,7 @@ class PositionCubitState extends Equatable {
           null,
           null,
           null,
+          const [],
           latestBookFilename: bibleFilename,
         );
 
@@ -42,38 +45,53 @@ class PositionCubitState extends Equatable {
   bool get latestBookIsScripture =>
       latestBookFilename == bibleFilename || latestBookFilename == bofmFilename;
 
+  final List<String> titlesFromCompanion;
+
   @override
   List<Object?> get props => [
         latestBookFilename,
         bookTitle,
         scriptureBookIndex,
         chapterIndex,
-        epubCfi
+        epubCfi,
+        titlesFromCompanion,
       ];
 }
 
 class PositionCubit extends Cubit<PositionCubitState> {
-  PositionCubit() : super(const PositionCubitState.initial());
+  PositionCubit(this.bookshelfRepository)
+      : super(const PositionCubitState.initial());
+
+  final BookshelfRepository bookshelfRepository;
 
   Future<void> openBook(String title) async {
+    // final device = await flutterWearOsConnectivity.getLocalDevice();
+    // final devices = await flutterWearOsConnectivity.getConnectedDevices();
+    // final items = await flutterWearOsConnectivity.getAllDataItems();
+    // items.forEach((i) {
+    //   print(i.data);
+    // });
+    bookshelfRepository.titlesAndFilepaths;
     assert(titleToFilename.containsKey(title), 'Invalid book title');
     emit(
-        PositionCubitState(
+      PositionCubitState(
         title,
-          null,
-          null,
-          null,
+        null,
+        null,
+        null,
+        state.titlesFromCompanion,
         latestBookFilename: state.latestBookFilename,
-        ),
-      );
+      ),
+    );
   }
 
   Future<void> closeBook() async => emit(
-      PositionCubitState(
-        null,
-        null,
-        null,
+        PositionCubitState(
           null,
+          null,
+          null,
+          null,
+          state.titlesFromCompanion,
           latestBookFilename: state.latestBookFilename,
         ),
       );
@@ -91,6 +109,7 @@ class PositionCubit extends Cubit<PositionCubitState> {
           state.scriptureBookIndex,
           null,
           null,
+          state.titlesFromCompanion,
           latestBookFilename: state.latestBookFilename,
         ),
       );
@@ -103,9 +122,10 @@ class PositionCubit extends Cubit<PositionCubitState> {
           null,
           null,
           null,
+          state.titlesFromCompanion,
           latestBookFilename: state.latestBookFilename,
-      ),
-    );
+        ),
+      );
       return false;
     }
     await closeBook();
@@ -119,6 +139,7 @@ class PositionCubit extends Cubit<PositionCubitState> {
         state.scriptureBookIndex,
         state.chapterIndex,
         state.epubCfi,
+        state.titlesFromCompanion,
         latestBookFilename: filename,
       ),
     );
@@ -130,6 +151,7 @@ class PositionCubit extends Cubit<PositionCubitState> {
           index,
           null,
           null,
+          state.titlesFromCompanion,
           latestBookFilename: state.latestBookFilename,
         ),
       );
@@ -141,9 +163,13 @@ class PositionCubit extends Cubit<PositionCubitState> {
           state.scriptureBookIndex,
           index,
           null,
+          state.titlesFromCompanion,
           latestBookFilename: state.latestBookFilename,
         ),
       );
+
+  Iterable<String> get bookshelfTitles =>
+      [...titleToFilename.keys, ...state.titlesFromCompanion];
 
   @override
   Future<void> close() async {

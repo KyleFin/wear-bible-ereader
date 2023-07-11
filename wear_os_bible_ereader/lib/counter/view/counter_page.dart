@@ -24,10 +24,10 @@ class BookshelfPage extends StatelessWidget {
         children: [
           Text(l10n.libraryAppBarTitle),
           const SizedBox(height: 10),
-          for (final k in titleToFilename.keys)
+          for (final t in cubit.bookshelfTitles)
             ElevatedButton(
-              onPressed: () => cubit.openBook(k),
-              child: Text(k),
+              onPressed: () => cubit.openBook(t),
+              child: Text(t),
             ),
           // const CounterText(),
           // const SizedBox(height: 10),
