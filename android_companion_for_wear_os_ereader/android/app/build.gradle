@@ -50,8 +50,8 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.example.verygoodcore.android_companion_for_wear_os_ereader"
+        // Companion and wear app use same appID so they share Data Layer.
+        applicationId "com.example.verygoodcore.wear_os_bible_ereader"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion flutter.minSdkVersion
