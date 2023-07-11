@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
+import 'package:bookshelf_repository/bookshelf_repository.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter_wear_os_connectivity/flutter_wear_os_connectivity.dart';
 
 class PositionCubitState extends Equatable {
   const PositionCubitState(
@@ -59,10 +59,10 @@ class PositionCubitState extends Equatable {
 }
 
 class PositionCubit extends Cubit<PositionCubitState> {
-  PositionCubit(this.flutterWearOsConnectivity)
+  PositionCubit(this.bookshelfRepository)
       : super(const PositionCubitState.initial());
 
-  final FlutterWearOsConnectivity flutterWearOsConnectivity;
+  final BookshelfRepository bookshelfRepository;
 
   Future<void> openBook(String title) async {
     // final device = await flutterWearOsConnectivity.getLocalDevice();
@@ -71,6 +71,7 @@ class PositionCubit extends Cubit<PositionCubitState> {
     // items.forEach((i) {
     //   print(i.data);
     // });
+    bookshelfRepository.titlesAndFilepaths;
     assert(titleToFilename.containsKey(title), 'Invalid book title');
     emit(
       PositionCubitState(

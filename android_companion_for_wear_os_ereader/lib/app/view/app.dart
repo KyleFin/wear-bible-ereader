@@ -1,18 +1,18 @@
 import 'package:android_companion_for_wear_os_ereader/counter/counter.dart';
 import 'package:android_companion_for_wear_os_ereader/l10n/l10n.dart';
+import 'package:bookshelf_repository/bookshelf_repository.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_wear_os_connectivity/flutter_wear_os_connectivity.dart';
 import 'package:provider/provider.dart';
 
 class App extends StatelessWidget {
-  const App({required this.flutterWearOsConnectivity, super.key});
+  const App({required this.bookshelfRepository, super.key});
 
-  final FlutterWearOsConnectivity flutterWearOsConnectivity;
+  final BookshelfRepository bookshelfRepository;
 
   @override
   Widget build(BuildContext context) {
     return Provider.value(
-      value: flutterWearOsConnectivity,
+      value: bookshelfRepository,
       child: const AppView(),
     );
   }

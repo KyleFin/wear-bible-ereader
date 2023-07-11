@@ -1,5 +1,6 @@
 import 'package:android_companion_for_wear_os_ereader/counter/counter.dart';
 import 'package:android_companion_for_wear_os_ereader/l10n/l10n.dart';
+import 'package:bookshelf_repository/bookshelf_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_wear_os_connectivity/flutter_wear_os_connectivity.dart';
@@ -10,7 +11,7 @@ class CounterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => CounterCubit(context.read<FlutterWearOsConnectivity>()),
+      create: (_) => CounterCubit(context.read<BookshelfRepository>()),
       child: const CounterView(),
     );
   }

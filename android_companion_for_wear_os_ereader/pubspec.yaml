@@ -8,6 +8,8 @@ environment:
 
 dependencies:
   bloc: ^8.1.2
+  bookshelf_repository:
+    path: ../packages/bookshelf_repository
   flutter:
     sdk: flutter
   flutter_bloc: ^8.1.3

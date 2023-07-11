@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:bookshelf_repository/bookshelf_repository.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_wear_os_connectivity/flutter_wear_os_connectivity.dart';
@@ -33,12 +34,16 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
     () async {
       // Add cross-flavor configuration here
       final flutterWearOsConnectivity = FlutterWearOsConnectivity();
-      WidgetsFlutterBinding.ensureInitialized();
-      await flutterWearOsConnectivity.configureWearableAPI();
+      // WidgetsFlutterBinding.ensureInitialized();
+      // await flutterWearOsConnectivity.configureWearableAPI();
 
       runApp(
         BlocProvider(
-          create: (_) => PositionCubit(flutterWearOsConnectivity),
+          create: (_) => PositionCubit(
+            FlutterWearOsConnectivityBookshelfRepository(
+              flutterWearOsConnectivity,
+            ),
+          ),
           child: await builder(),
         ),
       );
