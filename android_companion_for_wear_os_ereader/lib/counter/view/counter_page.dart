@@ -25,29 +25,41 @@ class CounterView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final bookshelfRepository = context.read<BookshelfRepository>();
+    final cubit = context.read<CounterCubit>();
     return Scaffold(
       appBar: AppBar(title: Text(l10n.counterAppBarTitle)),
       body: Center(
-        child: Column(
-          children: [
-            const CounterText(),
-            ElevatedButton(
-              onPressed: () async {
-                final result = await FilePicker.platform.pickFiles(
-                  type: FileType.custom,
-                  allowedExtensions: ['epub'],
-                );
+        child: StreamBuilder<Iterable<String>>(
+          initialData: bookshelfRepository.titlesAndFilepaths.keys,
+          stream:
+              bookshelfRepository.titlesAndFilepathsStream.map((t) => t.keys),
+          builder: (context, snapshot) {
+            return Column(
+              children: [
+                const CounterText(),
+                ElevatedButton(
+                  onPressed: () async {
+                    final result = await FilePicker.platform.pickFiles(
+                      type: FileType.custom,
+                      allowedExtensions: ['epub'],
+                    );
 
-                // The result will be null, if the user aborted the dialog
-                if (result != null) {
-                  await context
-                      .read<CounterCubit>()
-                      .addBook(File(result.files.first.path!));
-                }
-              },
-              child: const Text('Open file'),
-            ),
-          ],
+                    // The result will be null, if the user aborted the dialog
+                    if (result != null) {
+                      await cubit.addBook(File(result.files.first.path!));
+                    }
+                  },
+                  child: const Text('Transfer epub file'),
+                ),
+                for (final t in snapshot.data!)
+                  ElevatedButton(
+                    onPressed: () => cubit.deleteBook(t),
+                    child: Text('$t (delete)'),
+                  ),
+              ],
+            );
+          },
         ),
       ),
       floatingActionButton: Column(

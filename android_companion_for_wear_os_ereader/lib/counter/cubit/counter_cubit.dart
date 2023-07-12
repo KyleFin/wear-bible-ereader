@@ -20,7 +20,10 @@ class CounterCubit extends Cubit<int> {
       path: '/$filename',
       file: f,
     );
-    emit(state + 1);
+  }
+
+  Future<void> deleteBook(String title) async {
+    await bookshelfRepository.deleteBook(title);
   }
 
   Future<void> increment() async {
@@ -64,7 +67,6 @@ class CounterCubit extends Cubit<int> {
   }
 
   Future<void> decrement() async {
-    await bookshelfRepository.deleteBook('dracula');
     emit(state - 1);
   }
 }
