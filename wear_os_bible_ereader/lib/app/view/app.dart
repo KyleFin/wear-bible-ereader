@@ -76,7 +76,10 @@ class _EpubAppState extends State<EpubApp> {
       supportedLocales: AppLocalizations.supportedLocales,
       home: BlocListener<PositionCubit, PositionState>(
         listenWhen: (previous, current) {
-          final currBookFilename = titleToFilename[current.bookTitle];
+          final currBookFilename = titleToFilename[current.bookTitle] ??
+              context
+                  .read<BookshelfRepository>()
+                  .titlesAndFilepaths[current.bookTitle];
           final openNewBookRequired = currBookFilename != null &&
               // TODO Verify with tests (did with breakpoints).
               // Only change controller if opening a different book.
@@ -85,20 +88,33 @@ class _EpubAppState extends State<EpubApp> {
               previous.chapterIndex != current.chapterIndex;
           return openNewBookRequired || scrollToNewLocationRequired;
         },
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state.chapterIndex != null) {
             _epubReaderController.scrollTo(index: state.chapterIndex!);
           }
 
-          final bookFilename = titleToFilename[state.bookTitle]!;
+          final title = state.bookTitle!;
+          final bookshelfRepository = context.read<BookshelfRepository>();
+          final bookFilename = (titleToFilename[title] ??
+              bookshelfRepository.titlesAndFilepaths[title])!;
           if (bookFilename != state.latestBookFilename) {
-            context.read<PositionCubit>().setLatestBookFilename(bookFilename);
-            _epubReaderController.dispose();
-            _epubReaderController = EpubController(
-              document: EpubDocument.openAsset(
-                'assets/$bookFilename',
-              ),
-            );
+            final newDocument = titleToFilename.containsKey(title)
+                ? EpubDocument.openAsset(
+                    'assets/$bookFilename',
+                  )
+                : EpubDocument.openFile(
+                    (await bookshelfRepository.getBookFile(title))!,
+                  );
+            await context
+                .read<PositionCubit>()
+                .setLatestBookFilename(bookFilename);
+
+            //// TODO: Figure out cubit / controller / rebuild flow for loading
+            /// books from asset or File.
+            setState(() {
+              _epubReaderController.dispose();
+              _epubReaderController = EpubController(document: newDocument);
+            });
           }
         },
         child: FlowBuilder(

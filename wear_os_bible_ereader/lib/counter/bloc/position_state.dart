@@ -5,8 +5,7 @@ class PositionState extends Equatable {
     this.bookTitle,
     this.scriptureBookIndex,
     this.chapterIndex,
-    this.epubCfi,
-    this.titlesFromCompanion, {
+    this.epubCfi, {
     required this.latestBookFilename,
   });
 
@@ -16,7 +15,6 @@ class PositionState extends Equatable {
           null,
           null,
           null,
-          const [],
           latestBookFilename: bibleFilename,
         );
 
@@ -43,8 +41,6 @@ class PositionState extends Equatable {
   bool get latestBookIsScripture =>
       latestBookFilename == bibleFilename || latestBookFilename == bofmFilename;
 
-  final List<String> titlesFromCompanion;
-
   @override
   List<Object?> get props => [
         latestBookFilename,
@@ -52,6 +48,5 @@ class PositionState extends Equatable {
         scriptureBookIndex,
         chapterIndex,
         epubCfi,
-        titlesFromCompanion,
       ];
 }

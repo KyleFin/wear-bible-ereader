@@ -11,21 +11,17 @@ class PositionCubit extends Cubit<PositionState> {
   final BookshelfRepository bookshelfRepository;
 
   Future<void> openBook(String title) async {
-    // final device = await flutterWearOsConnectivity.getLocalDevice();
-    // final devices = await flutterWearOsConnectivity.getConnectedDevices();
-    // final items = await flutterWearOsConnectivity.getAllDataItems();
-    // items.forEach((i) {
-    //   print(i.data);
-    // });
-    bookshelfRepository.titlesAndFilepaths;
-    assert(titleToFilename.containsKey(title), 'Invalid book title');
+    assert(
+      titleToFilename.containsKey(title) ||
+          bookshelfRepository.titlesAndFilepaths.containsKey(title),
+      'Invalid book title',
+    );
     emit(
       PositionState(
         title,
         null,
         null,
         null,
-        state.titlesFromCompanion,
         latestBookFilename: state.latestBookFilename,
       ),
     );
@@ -37,7 +33,6 @@ class PositionCubit extends Cubit<PositionState> {
           null,
           null,
           null,
-          state.titlesFromCompanion,
           latestBookFilename: state.latestBookFilename,
         ),
       );
@@ -55,7 +50,6 @@ class PositionCubit extends Cubit<PositionState> {
           state.scriptureBookIndex,
           null,
           null,
-          state.titlesFromCompanion,
           latestBookFilename: state.latestBookFilename,
         ),
       );
@@ -68,7 +62,6 @@ class PositionCubit extends Cubit<PositionState> {
           null,
           null,
           null,
-          state.titlesFromCompanion,
           latestBookFilename: state.latestBookFilename,
         ),
       );
@@ -85,7 +78,6 @@ class PositionCubit extends Cubit<PositionState> {
         state.scriptureBookIndex,
         state.chapterIndex,
         state.epubCfi,
-        state.titlesFromCompanion,
         latestBookFilename: filename,
       ),
     );
@@ -97,7 +89,6 @@ class PositionCubit extends Cubit<PositionState> {
           index,
           null,
           null,
-          state.titlesFromCompanion,
           latestBookFilename: state.latestBookFilename,
         ),
       );
@@ -109,7 +100,6 @@ class PositionCubit extends Cubit<PositionState> {
           state.scriptureBookIndex,
           index,
           null,
-          state.titlesFromCompanion,
           latestBookFilename: state.latestBookFilename,
         ),
       );
