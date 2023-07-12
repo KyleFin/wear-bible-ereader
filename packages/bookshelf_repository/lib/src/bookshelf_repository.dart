@@ -30,7 +30,9 @@ abstract class BookshelfRepository {
   Future<void> onChange();
 
   /// Returns [File] using filepath for book with [title].
-  Future<File> getBookFile(String title);
+  ///
+  /// Returns null if [title] is not in [titlesAndFilepaths].
+  Future<File?> getBookFile(String title);
 
   /// Clean up when repository is disposed.
   void dispose();

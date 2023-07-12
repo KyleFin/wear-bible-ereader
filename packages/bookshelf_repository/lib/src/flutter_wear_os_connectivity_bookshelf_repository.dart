@@ -62,6 +62,9 @@ class FlutterWearOsConnectivityBookshelfRepository
       data: {...titlesAndFilepaths, title: path},
       isUrgent: true,
     );
+    // Store file in a separate path (instead of in _dataLayerBookshelfPath's
+    // files parameter) so we don't have to read all the epub files when
+    // fetching the list of book titles with titlesAndFilepaths.
     await _connectivity
         .syncData(path: path, data: {'title': title}, files: {'book': file});
   }
@@ -85,7 +88,7 @@ class FlutterWearOsConnectivityBookshelfRepository
   }
 
   @override
-  Future<File> getBookFile(String title) {
+  Future<File?> getBookFile(String title) {
     // TODO: implement getBookFile
     throw UnimplementedError();
   }
