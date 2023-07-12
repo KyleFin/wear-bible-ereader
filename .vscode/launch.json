@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "android_companion_for_wear_os_ereader",
+            "name": "DEV android_companion_for_wear_os_ereader",
             "cwd": "android_companion_for_wear_os_ereader",
             "request": "launch",
             "type": "dart",
@@ -16,10 +16,9 @@
                 "--target",
                 "lib/main_development.dart"
             ]
-            
         },
         {
-            "name": "android_companion_for_wear_os_ereader (profile mode)",
+            "name": "DEV android_companion_for_wear_os_ereader (profile mode)",
             "cwd": "android_companion_for_wear_os_ereader",
             "request": "launch",
             "type": "dart",
@@ -31,10 +30,9 @@
                 "--target",
                 "lib/main_development.dart"
             ]
-            
         },
         {
-            "name": "android_companion_for_wear_os_ereader (release mode)",
+            "name": "DEV android_companion_for_wear_os_ereader (release mode)",
             "cwd": "android_companion_for_wear_os_ereader",
             "request": "launch",
             "type": "dart",
@@ -46,10 +44,9 @@
                 "--target",
                 "lib/main_development.dart"
             ]
-            
         },
         {
-            "name": "wear_os_bible_ereader",
+            "name": "DEV wear_os_bible_ereader",
             "cwd": "wear_os_bible_ereader",
             "request": "launch",
             "type": "dart",
@@ -60,10 +57,9 @@
                 "--target",
                 "lib/main_development.dart"
             ]
-            
         },
         {
-            "name": "wear_os_bible_ereader (profile mode)",
+            "name": "DEV wear_os_bible_ereader (profile mode)",
             "cwd": "wear_os_bible_ereader",
             "request": "launch",
             "type": "dart",
@@ -75,10 +71,9 @@
                 "--target",
                 "lib/main_development.dart"
             ]
-            
         },
         {
-            "name": "wear_os_bible_ereader (release mode)",
+            "name": "DEV wear_os_bible_ereader (release mode)",
             "cwd": "wear_os_bible_ereader",
             "request": "launch",
             "type": "dart",
@@ -90,7 +85,88 @@
                 "--target",
                 "lib/main_development.dart"
             ]
-            
+        },
+        {
+            "name": "PROD android_companion_for_wear_os_ereader",
+            "cwd": "android_companion_for_wear_os_ereader",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main_production.dart",
+            "args": [
+                "--flavor",
+                "production",
+                "--target",
+                "lib/main_production.dart"
+            ]
+        },
+        {
+            "name": "PROD android_companion_for_wear_os_ereader (profile mode)",
+            "cwd": "android_companion_for_wear_os_ereader",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile",
+            "program": "lib/main_production.dart",
+            "args": [
+                "--flavor",
+                "production",
+                "--target",
+                "lib/main_production.dart"
+            ]
+        },
+        {
+            "name": "PROD android_companion_for_wear_os_ereader (release mode)",
+            "cwd": "android_companion_for_wear_os_ereader",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release",
+            "program": "lib/main_production.dart",
+            "args": [
+                "--flavor",
+                "production",
+                "--target",
+                "lib/main_production.dart"
+            ]
+        },
+        {
+            "name": "PROD wear_os_bible_ereader",
+            "cwd": "wear_os_bible_ereader",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main_production.dart",
+            "args": [
+                "--flavor",
+                "production",
+                "--target",
+                "lib/main_production.dart"
+            ]
+        },
+        {
+            "name": "PROD wear_os_bible_ereader (profile mode)",
+            "cwd": "wear_os_bible_ereader",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile",
+            "program": "lib/main_production.dart",
+            "args": [
+                "--flavor",
+                "production",
+                "--target",
+                "lib/main_production.dart"
+            ]
+        },
+        {
+            "name": "PROD wear_os_bible_ereader (release mode)",
+            "cwd": "wear_os_bible_ereader",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release",
+            "program": "lib/main_production.dart",
+            "args": [
+                "--flavor",
+                "production",
+                "--target",
+                "lib/main_production.dart"
+            ]
         }
     ]
 }

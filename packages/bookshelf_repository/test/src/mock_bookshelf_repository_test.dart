@@ -81,6 +81,11 @@ void main() {
       });
     });
 
+    test('initialize does not throw', () async {
+      final repository = MockBookshelfRepository();
+      expect(repository.initialize(), completes);
+    });
+
     test('dispose closes stream', () async {
       final repository = MockBookshelfRepository()..dispose();
       expect(

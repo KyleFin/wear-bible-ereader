@@ -34,6 +34,9 @@ abstract class BookshelfRepository {
   /// Returns null if [title] is not in [titlesAndFilepaths].
   Future<File?> getBookFile(String title);
 
+  /// Setup to be performed before using repository.
+  Future<void> initialize();
+
   /// Clean up when repository is disposed.
   void dispose();
 }

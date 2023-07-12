@@ -2,9 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
-import 'package:bookshelf_repository/bookshelf_repository.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_wear_os_connectivity/flutter_wear_os_connectivity.dart';
 
 class AppBlocObserver extends BlocObserver {
   const AppBlocObserver();
@@ -22,8 +20,7 @@ class AppBlocObserver extends BlocObserver {
   }
 }
 
-Future<void> bootstrap(
-    FutureOr<Widget> Function(BookshelfRepository) builder) async {
+Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
   FlutterError.onError = (details) {
     log(details.exceptionAsString(), stackTrace: details.stack);
   };
@@ -31,11 +28,6 @@ Future<void> bootstrap(
   Bloc.observer = const AppBlocObserver();
 
   // Add cross-flavor configuration here
-  final connectivity = FlutterWearOsConnectivity();
-  WidgetsFlutterBinding.ensureInitialized();
-  await connectivity.configureWearableAPI();
 
-  runApp(
-    await builder(FlutterWearOsConnectivityBookshelfRepository(connectivity)),
-  );
+  runApp(await builder());
 }

@@ -1,3 +1,4 @@
+import 'package:bookshelf_repository/bookshelf_repository.dart';
 import 'package:epub_view/epub_view.dart';
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
@@ -5,14 +6,31 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wear_os_bible_ereader/counter/counter.dart';
 import 'package:wear_os_bible_ereader/l10n/l10n.dart';
 
-class App extends StatefulWidget {
-  const App({super.key});
+class App extends StatelessWidget {
+  App({required this.bookshelfRepository, super.key}) {
+    WidgetsFlutterBinding.ensureInitialized();
+    bookshelfRepository.initialize();
+  }
+
+  final BookshelfRepository bookshelfRepository;
 
   @override
-  State<App> createState() => _AppState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => PositionCubit(bookshelfRepository),
+      child: const EpubApp(),
+    );
+  }
 }
 
-class _AppState extends State<App> {
+class EpubApp extends StatefulWidget {
+  const EpubApp({super.key});
+
+  @override
+  State<EpubApp> createState() => _EpubAppState();
+}
+
+class _EpubAppState extends State<EpubApp> {
   List<Page> onGeneratePages(PositionCubitState state, List<Page> pages) {
     final selectedBook = state.bookTitle;
     return [

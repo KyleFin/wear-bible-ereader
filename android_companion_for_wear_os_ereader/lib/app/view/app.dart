@@ -2,16 +2,19 @@ import 'package:android_companion_for_wear_os_ereader/counter/counter.dart';
 import 'package:android_companion_for_wear_os_ereader/l10n/l10n.dart';
 import 'package:bookshelf_repository/bookshelf_repository.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class App extends StatelessWidget {
-  const App({required this.bookshelfRepository, super.key});
+  App({required this.bookshelfRepository, super.key}) {
+    WidgetsFlutterBinding.ensureInitialized();
+    bookshelfRepository.initialize();
+  }
 
   final BookshelfRepository bookshelfRepository;
 
   @override
   Widget build(BuildContext context) {
-    return Provider.value(
+    return RepositoryProvider.value(
       value: bookshelfRepository,
       child: const AppView(),
     );

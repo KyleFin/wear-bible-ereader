@@ -18,18 +18,9 @@ final _bookshelfUri =
 class FlutterWearOsConnectivityBookshelfRepository
     implements BookshelfRepository {
   /// Default constructor.
-  FlutterWearOsConnectivityBookshelfRepository(this._connectivity) {
-    _connectivity.configureWearableAPI();
-    _connectivity
-        .dataChanged(
-            // TODO: Uncomment to only listen for bookshelf changes (not Files).
-            // pathURI: _bookshelfUri
-            )
-        .listen((event) {
-      onChange();
-    });
-    _refreshBookshelf();
-  }
+  FlutterWearOsConnectivityBookshelfRepository({
+    FlutterWearOsConnectivity? connectivity,
+  }) : _connectivity = connectivity ?? FlutterWearOsConnectivity();
 
   /// Handles read, write, delete operations between companion app and watch.
   final FlutterWearOsConnectivity _connectivity;
@@ -119,6 +110,20 @@ class FlutterWearOsConnectivityBookshelfRepository
                     .map((key, value) => MapEntry(key, value.toString())),
           ),
     );
+  }
+
+  @override
+  Future<void> initialize() async {
+    await _connectivity.configureWearableAPI();
+    _connectivity
+        .dataChanged(
+            // TODO: Uncomment to only listen for bookshelf changes (not Files).
+            // pathURI: _bookshelfUri
+            )
+        .listen((event) {
+      onChange();
+    });
+    await _refreshBookshelf();
   }
 
   @override

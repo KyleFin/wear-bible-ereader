@@ -57,6 +57,9 @@ class MockBookshelfRepository implements BookshelfRepository {
   Future<File?> getBookFile(String title) async => _files[title];
 
   @override
+  Future<void> initialize() async {}
+
+  @override
   void dispose() {
     _titlesAndFilepaths.close();
   }
