@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "DEV android_companion_for_wear_os_ereader",
+            "name": "MOCK android_companion_for_wear_os_ereader",
             "cwd": "android_companion_for_wear_os_ereader",
             "request": "launch",
             "type": "dart",
@@ -18,7 +18,7 @@
             ]
         },
         {
-            "name": "DEV android_companion_for_wear_os_ereader (profile mode)",
+            "name": "MOCK android_companion_for_wear_os_ereader (profile mode)",
             "cwd": "android_companion_for_wear_os_ereader",
             "request": "launch",
             "type": "dart",
@@ -32,7 +32,7 @@
             ]
         },
         {
-            "name": "DEV android_companion_for_wear_os_ereader (release mode)",
+            "name": "MOCK android_companion_for_wear_os_ereader (release mode)",
             "cwd": "android_companion_for_wear_os_ereader",
             "request": "launch",
             "type": "dart",
@@ -46,7 +46,7 @@
             ]
         },
         {
-            "name": "DEV wear_os_bible_ereader",
+            "name": "MOCK wear_os_bible_ereader",
             "cwd": "wear_os_bible_ereader",
             "request": "launch",
             "type": "dart",
@@ -59,7 +59,7 @@
             ]
         },
         {
-            "name": "DEV wear_os_bible_ereader (profile mode)",
+            "name": "MOCK wear_os_bible_ereader (profile mode)",
             "cwd": "wear_os_bible_ereader",
             "request": "launch",
             "type": "dart",
@@ -73,7 +73,7 @@
             ]
         },
         {
-            "name": "DEV wear_os_bible_ereader (release mode)",
+            "name": "MOCK wear_os_bible_ereader (release mode)",
             "cwd": "wear_os_bible_ereader",
             "request": "launch",
             "type": "dart",

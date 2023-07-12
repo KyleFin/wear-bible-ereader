@@ -16,9 +16,12 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => PositionCubit(bookshelfRepository),
-      child: const EpubApp(),
+    return RepositoryProvider.value(
+      value: bookshelfRepository,
+      child: BlocProvider(
+        create: (_) => PositionCubit(bookshelfRepository),
+        child: const EpubApp(),
+      ),
     );
   }
 }
@@ -31,7 +34,7 @@ class EpubApp extends StatefulWidget {
 }
 
 class _EpubAppState extends State<EpubApp> {
-  List<Page> onGeneratePages(PositionCubitState state, List<Page> pages) {
+  List<Page> onGeneratePages(PositionState state, List<Page> pages) {
     final selectedBook = state.bookTitle;
     return [
       BookshelfPage.page(),
@@ -71,7 +74,7 @@ class _EpubAppState extends State<EpubApp> {
       ),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: BlocListener<PositionCubit, PositionCubitState>(
+      home: BlocListener<PositionCubit, PositionState>(
         listenWhen: (previous, current) {
           final currBookFilename = titleToFilename[current.bookTitle];
           final openNewBookRequired = currBookFilename != null &&
@@ -129,7 +132,7 @@ class BookDetailsPage extends StatelessWidget {
         appBar: AppBar(title: const Text('Details')),
         body: Padding(
           padding: const EdgeInsets.all(8),
-          child: BlocBuilder<PositionCubit, PositionCubitState>(
+          child: BlocBuilder<PositionCubit, PositionState>(
             builder: (context, state) {
               return Stack(
                 children: [

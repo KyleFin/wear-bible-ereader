@@ -1,2 +1,2 @@
-export 'cubit/position_cubit.dart';
+export 'bloc/position_bloc.dart';
 export 'view/counter_page.dart';

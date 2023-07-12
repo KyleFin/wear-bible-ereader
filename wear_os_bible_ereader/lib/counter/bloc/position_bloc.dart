@@ -2,65 +2,11 @@ import 'package:bloc/bloc.dart';
 import 'package:bookshelf_repository/bookshelf_repository.dart';
 import 'package:equatable/equatable.dart';
 
-class PositionCubitState extends Equatable {
-  const PositionCubitState(
-    this.bookTitle,
-    this.scriptureBookIndex,
-    this.chapterIndex,
-    this.epubCfi,
-    this.titlesFromCompanion, {
-    required this.latestBookFilename,
-  });
+part 'position_state.dart';
 
-  const PositionCubitState.initial()
-      : this(
-          null,
-          null,
-          null,
-          null,
-          const [],
-          latestBookFilename: bibleFilename,
-        );
-
-  /// Latest epub file which was loaded in Epub controller.
-  ///
-  /// If user returns to root menu then goes back to the same book, we need not
-  /// reload it.
-  final String latestBookFilename;
-
-  final String? bookTitle;
-
-  /// Index within table of contents of selected scripture book.
-  ///
-  /// Used to decide how many chapters should be displayed in sub-chapter menu.
-  final int? scriptureBookIndex;
-
-  /// Represents the EpubViewChapter's startIndex for use in scrollTo.
-  final int? chapterIndex;
-
-  /// Stores current position as text is scrolled. Used for cold boot.
-  final String?
-      epubCfi; // TODO make Map<String, String?> to store latest cfi for each epub file?
-
-  bool get latestBookIsScripture =>
-      latestBookFilename == bibleFilename || latestBookFilename == bofmFilename;
-
-  final List<String> titlesFromCompanion;
-
-  @override
-  List<Object?> get props => [
-        latestBookFilename,
-        bookTitle,
-        scriptureBookIndex,
-        chapterIndex,
-        epubCfi,
-        titlesFromCompanion,
-      ];
-}
-
-class PositionCubit extends Cubit<PositionCubitState> {
+class PositionCubit extends Cubit<PositionState> {
   PositionCubit(this.bookshelfRepository)
-      : super(const PositionCubitState.initial());
+      : super(const PositionState.initial());
 
   final BookshelfRepository bookshelfRepository;
 
@@ -74,7 +20,7 @@ class PositionCubit extends Cubit<PositionCubitState> {
     bookshelfRepository.titlesAndFilepaths;
     assert(titleToFilename.containsKey(title), 'Invalid book title');
     emit(
-      PositionCubitState(
+      PositionState(
         title,
         null,
         null,
@@ -86,7 +32,7 @@ class PositionCubit extends Cubit<PositionCubitState> {
   }
 
   Future<void> closeBook() async => emit(
-        PositionCubitState(
+        PositionState(
           null,
           null,
           null,
@@ -104,7 +50,7 @@ class PositionCubit extends Cubit<PositionCubitState> {
     // }
     if (state.chapterIndex != null) {
       emit(
-        PositionCubitState(
+        PositionState(
           state.bookTitle,
           state.scriptureBookIndex,
           null,
@@ -117,7 +63,7 @@ class PositionCubit extends Cubit<PositionCubitState> {
     }
     if (state.scriptureBookIndex != null) {
       emit(
-        PositionCubitState(
+        PositionState(
           state.bookTitle,
           null,
           null,
@@ -134,7 +80,7 @@ class PositionCubit extends Cubit<PositionCubitState> {
 
   Future<void> setLatestBookFilename(String filename) async {
     emit(
-      PositionCubitState(
+      PositionState(
         state.bookTitle,
         state.scriptureBookIndex,
         state.chapterIndex,
@@ -146,7 +92,7 @@ class PositionCubit extends Cubit<PositionCubitState> {
   }
 
   void setScriptureBookIndex(int index) => emit(
-        PositionCubitState(
+        PositionState(
           state.bookTitle,
           index,
           null,
@@ -158,7 +104,7 @@ class PositionCubit extends Cubit<PositionCubitState> {
 
   /// [index] represents the EpubViewChapter's startIndex for use in scrollTo.
   void selectChapter(int index) => emit(
-        PositionCubitState(
+        PositionState(
           state.bookTitle,
           state.scriptureBookIndex,
           index,
@@ -167,9 +113,6 @@ class PositionCubit extends Cubit<PositionCubitState> {
           latestBookFilename: state.latestBookFilename,
         ),
       );
-
-  Iterable<String> get bookshelfTitles =>
-      [...titleToFilename.keys, ...state.titlesFromCompanion];
 
   @override
   Future<void> close() async {
