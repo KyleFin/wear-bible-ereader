@@ -98,10 +98,8 @@ class FlutterWearOsConnectivityBookshelfRepository
     return _refreshBookshelf();
   }
 
+  /// Updates [_titlesAndFilepaths] with current values in Data Layer.
   Future<void> _refreshBookshelf() async {
-    final device = await _connectivity.getLocalDevice();
-    final devices = await _connectivity.getConnectedDevices();
-    final items = await _connectivity.getAllDataItems();
     _titlesAndFilepaths.add(
       await _connectivity.findDataItemsOnURIPath(pathURI: _bookshelfUri).then(
             (d) => d.isEmpty
