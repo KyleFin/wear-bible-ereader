@@ -88,9 +88,18 @@ class FlutterWearOsConnectivityBookshelfRepository
   }
 
   @override
-  Future<File?> getBookFile(String title) {
-    // TODO: implement getBookFile
-    throw UnimplementedError();
+  Future<File?> getBookFile(String title) async {
+    return titlesAndFilepaths.containsKey(title)
+        ? _connectivity
+            .findDataItemsOnURIPath(
+              pathURI: Uri(
+                scheme: _uriScheme,
+                host: '*',
+                path: titlesAndFilepaths[title],
+              ),
+            )
+            .then((dataItem) => dataItem.single.files.values.single)
+        : null;
   }
 
   @override

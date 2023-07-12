@@ -14,9 +14,10 @@ class CounterCubit extends Cubit<int> {
   final BookshelfRepository bookshelfRepository;
 
   Future<void> addBook(File f) async {
+    final filename = f.path.split('/').last.split('.').first;
     await bookshelfRepository.addBook(
-      title: 'Frankenstein',
-      path: '/frank',
+      title: filename,
+      path: '/$filename',
       file: f,
     );
     emit(state + 1);
@@ -53,16 +54,17 @@ class CounterCubit extends Cubit<int> {
     //         path: "/path_count_2"));
     // final items = await connectivity.getAllDataItems();
     //print(afterDataItems);
-    await bookshelfRepository.addBook(
-      title: 'Frankenstein',
-      path: '/frank',
-      file: File(''),
-    );
+
+    // await bookshelfRepository.addBook(
+    //   title: 'Frankenstein',
+    //   path: '/frank',
+    //   file: File(''),
+    // );
     emit(state + 1);
   }
 
   Future<void> decrement() async {
-    await bookshelfRepository.deleteBook('Frankenstein');
+    await bookshelfRepository.deleteBook('dracula');
     emit(state - 1);
   }
 }
