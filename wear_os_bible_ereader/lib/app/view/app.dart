@@ -89,32 +89,29 @@ class _EpubAppState extends State<EpubApp> {
           return openNewBookRequired || scrollToNewLocationRequired;
         },
         listener: (context, state) async {
+          final positionCubit = context.read<PositionCubit>();
+          final bookshelfRepository = context.read<BookshelfRepository>();
+
           if (state.chapterIndex != null) {
-            _epubReaderController.scrollTo(index: state.chapterIndex!);
+            await _epubReaderController.scrollTo(index: state.chapterIndex!);
           }
 
           final title = state.bookTitle!;
-          final bookshelfRepository = context.read<BookshelfRepository>();
           final bookFilename = (titleToFilename[title] ??
               bookshelfRepository.titlesAndFilepaths[title])!;
           if (bookFilename != state.latestBookFilename) {
+            await positionCubit.setLoadingDocument(true);
+            await positionCubit.setLatestBookFilename(bookFilename);
             final newDocument = titleToFilename.containsKey(title)
-                ? EpubDocument.openAsset(
-                    'assets/$bookFilename',
-                  )
+                ? EpubDocument.openAsset('assets/$bookFilename')
                 : EpubDocument.openFile(
                     (await bookshelfRepository.getBookFile(title))!,
                   );
-            await context
-                .read<PositionCubit>()
-                .setLatestBookFilename(bookFilename);
 
-            //// TODO: Figure out cubit / controller / rebuild flow for loading
-            /// books from asset or File.
-            setState(() {
-              _epubReaderController.dispose();
-              _epubReaderController = EpubController(document: newDocument);
-            });
+            _epubReaderController.dispose();
+            _epubReaderController = EpubController(document: newDocument);
+
+            await positionCubit.setLoadingDocument(false);
           }
         },
         child: FlowBuilder(
@@ -150,24 +147,27 @@ class BookDetailsPage extends StatelessWidget {
           padding: const EdgeInsets.all(8),
           child: BlocBuilder<PositionCubit, PositionState>(
             builder: (context, state) {
-              return Stack(
-                children: [
-                  // Always build EpubView (and sometimes hide it behind menu)
-                  // since it seems to handle all the controller loading and
-                  // listenable notification logic. I originally tried having
-                  // table of contents in a separate page (instead of a Stack)
-                  // but it would never get notified that listenable values
-                  // changed or that the document finished loading. I'm not
-                  // sure if this is the best approach, but it seems to work
-                  // well having an EpubView always in the widget tree (even
-                  // if it's not visible).
-                  EpubView(controller: epubController),
-                  if (state.chapterIndex == null) ...[
-                    Container(color: Theme.of(context).colorScheme.background),
-                    TableOfContents(epubController: epubController),
-                  ],
-                ],
-              );
+              return state.loadingDocument
+                  ? Text('Loading ${state.bookTitle}')
+                  : Stack(
+                      children: [
+                        // Always build EpubView (and sometimes hide it behind menu)
+                        // since it seems to handle all the controller loading and
+                        // listenable notification logic. I originally tried having
+                        // table of contents in a separate page (instead of a Stack)
+                        // but it would never get notified that listenable values
+                        // changed or that the document finished loading. I'm not
+                        // sure if this is the best approach, but it seems to work
+                        // well having an EpubView always in the widget tree (even
+                        // if it's not visible).
+                        EpubView(controller: epubController),
+                        if (state.chapterIndex == null) ...[
+                          Container(
+                              color: Theme.of(context).colorScheme.background),
+                          TableOfContents(epubController: epubController),
+                        ],
+                      ],
+                    );
             },
           ),
         ),

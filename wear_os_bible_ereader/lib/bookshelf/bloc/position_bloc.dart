@@ -23,6 +23,7 @@ class PositionCubit extends Cubit<PositionState> {
         null,
         null,
         latestBookFilename: state.latestBookFilename,
+        loadingDocument: state.loadingDocument,
       ),
     );
   }
@@ -34,6 +35,7 @@ class PositionCubit extends Cubit<PositionState> {
           null,
           null,
           latestBookFilename: state.latestBookFilename,
+          loadingDocument: state.loadingDocument,
         ),
       );
 
@@ -51,6 +53,7 @@ class PositionCubit extends Cubit<PositionState> {
           null,
           null,
           latestBookFilename: state.latestBookFilename,
+          loadingDocument: state.loadingDocument,
         ),
       );
       return false;
@@ -63,12 +66,26 @@ class PositionCubit extends Cubit<PositionState> {
           null,
           null,
           latestBookFilename: state.latestBookFilename,
+          loadingDocument: state.loadingDocument,
         ),
       );
       return false;
     }
     await closeBook();
     return true;
+  }
+
+  Future<void> setLoadingDocument(bool value) async {
+    emit(
+      PositionState(
+        state.bookTitle,
+        state.scriptureBookIndex,
+        state.chapterIndex,
+        state.epubCfi,
+        latestBookFilename: state.latestBookFilename,
+        loadingDocument: value,
+      ),
+    );
   }
 
   Future<void> setLatestBookFilename(String filename) async {
@@ -79,6 +96,7 @@ class PositionCubit extends Cubit<PositionState> {
         state.chapterIndex,
         state.epubCfi,
         latestBookFilename: filename,
+        loadingDocument: state.loadingDocument,
       ),
     );
   }
@@ -90,6 +108,7 @@ class PositionCubit extends Cubit<PositionState> {
           null,
           null,
           latestBookFilename: state.latestBookFilename,
+          loadingDocument: state.loadingDocument,
         ),
       );
 
@@ -101,6 +120,7 @@ class PositionCubit extends Cubit<PositionState> {
           index,
           null,
           latestBookFilename: state.latestBookFilename,
+          loadingDocument: state.loadingDocument,
         ),
       );
 
