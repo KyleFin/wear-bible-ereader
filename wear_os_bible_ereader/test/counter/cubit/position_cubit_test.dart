@@ -1,10 +1,10 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:wear_os_bible_ereader/counter/counter.dart';
+import 'package:wear_os_bible_ereader/bookshelf/bookshelf.dart';
 
 void main() {
-  group('CounterCubit', () {
+  group('PositionCubit', () {
     test('initial state is 0', () {
       expect(PositionCubit().state, equals(0));
     });

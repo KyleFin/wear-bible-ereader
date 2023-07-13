@@ -3,7 +3,7 @@ import 'package:epub_view/epub_view.dart';
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:wear_os_bible_ereader/counter/counter.dart';
+import 'package:wear_os_bible_ereader/bookshelf/bookshelf.dart';
 import 'package:wear_os_bible_ereader/l10n/l10n.dart';
 
 class App extends StatelessWidget {

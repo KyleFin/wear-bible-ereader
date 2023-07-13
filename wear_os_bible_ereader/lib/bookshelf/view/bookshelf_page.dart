@@ -1,9 +1,7 @@
 import 'package:bookshelf_repository/bookshelf_repository.dart';
-import 'package:epub_view/epub_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:wear_os_bible_ereader/counter/counter.dart';
-import 'package:wear_os_bible_ereader/epub/epub.dart';
+import 'package:wear_os_bible_ereader/bookshelf/bookshelf.dart';
 import 'package:wear_os_bible_ereader/l10n/l10n.dart';
 
 class BookshelfPage extends StatelessWidget {
