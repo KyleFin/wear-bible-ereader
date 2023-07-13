@@ -8,6 +8,8 @@ environment:
 
 dependencies:
   bloc: ^8.1.1
+  bookshelf_repository:
+    path: ../packages/bookshelf_repository
   epub_view: ^3.2.0
   equatable: ^2.0.5
   flow_builder: ^0.0.9

@@ -1,3 +1,4 @@
+import 'package:bookshelf_repository/bookshelf_repository.dart';
 import 'package:epub_view/epub_view.dart';
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
@@ -5,15 +6,35 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wear_os_bible_ereader/counter/counter.dart';
 import 'package:wear_os_bible_ereader/l10n/l10n.dart';
 
-class App extends StatefulWidget {
-  const App({super.key});
+class App extends StatelessWidget {
+  App({required this.bookshelfRepository, super.key}) {
+    WidgetsFlutterBinding.ensureInitialized();
+    bookshelfRepository.initialize();
+  }
+
+  final BookshelfRepository bookshelfRepository;
 
   @override
-  State<App> createState() => _AppState();
+  Widget build(BuildContext context) {
+    return RepositoryProvider.value(
+      value: bookshelfRepository,
+      child: BlocProvider(
+        create: (_) => PositionCubit(bookshelfRepository),
+        child: const EpubApp(),
+      ),
+    );
+  }
 }
 
-class _AppState extends State<App> {
-  List<Page> onGeneratePages(PositionCubitState state, List<Page> pages) {
+class EpubApp extends StatefulWidget {
+  const EpubApp({super.key});
+
+  @override
+  State<EpubApp> createState() => _EpubAppState();
+}
+
+class _EpubAppState extends State<EpubApp> {
+  List<Page> onGeneratePages(PositionState state, List<Page> pages) {
     final selectedBook = state.bookTitle;
     return [
       BookshelfPage.page(),
@@ -53,9 +74,12 @@ class _AppState extends State<App> {
       ),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: BlocListener<PositionCubit, PositionCubitState>(
+      home: BlocListener<PositionCubit, PositionState>(
         listenWhen: (previous, current) {
-          final currBookFilename = titleToFilename[current.bookTitle];
+          final currBookFilename = titleToFilename[current.bookTitle] ??
+              context
+                  .read<BookshelfRepository>()
+                  .titlesAndFilepaths[current.bookTitle];
           final openNewBookRequired = currBookFilename != null &&
               // TODO Verify with tests (did with breakpoints).
               // Only change controller if opening a different book.
@@ -64,20 +88,33 @@ class _AppState extends State<App> {
               previous.chapterIndex != current.chapterIndex;
           return openNewBookRequired || scrollToNewLocationRequired;
         },
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state.chapterIndex != null) {
             _epubReaderController.scrollTo(index: state.chapterIndex!);
           }
 
-          final bookFilename = titleToFilename[state.bookTitle]!;
+          final title = state.bookTitle!;
+          final bookshelfRepository = context.read<BookshelfRepository>();
+          final bookFilename = (titleToFilename[title] ??
+              bookshelfRepository.titlesAndFilepaths[title])!;
           if (bookFilename != state.latestBookFilename) {
-            context.read<PositionCubit>().setLatestBookFilename(bookFilename);
-            _epubReaderController.dispose();
-            _epubReaderController = EpubController(
-              document: EpubDocument.openAsset(
-                'assets/$bookFilename',
-              ),
-            );
+            final newDocument = titleToFilename.containsKey(title)
+                ? EpubDocument.openAsset(
+                    'assets/$bookFilename',
+                  )
+                : EpubDocument.openFile(
+                    (await bookshelfRepository.getBookFile(title))!,
+                  );
+            await context
+                .read<PositionCubit>()
+                .setLatestBookFilename(bookFilename);
+
+            //// TODO: Figure out cubit / controller / rebuild flow for loading
+            /// books from asset or File.
+            setState(() {
+              _epubReaderController.dispose();
+              _epubReaderController = EpubController(document: newDocument);
+            });
           }
         },
         child: FlowBuilder(
@@ -111,7 +148,7 @@ class BookDetailsPage extends StatelessWidget {
         appBar: AppBar(title: const Text('Details')),
         body: Padding(
           padding: const EdgeInsets.all(8),
-          child: BlocBuilder<PositionCubit, PositionCubitState>(
+          child: BlocBuilder<PositionCubit, PositionState>(
             builder: (context, state) {
               return Stack(
                 children: [
