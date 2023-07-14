@@ -7,6 +7,7 @@ class PositionState extends Equatable {
     this.chapterIndex,
     this.epubCfi, {
     required this.latestBookFilename,
+    required this.loadingDocument,
   });
 
   const PositionState.initial()
@@ -16,6 +17,7 @@ class PositionState extends Equatable {
           null,
           null,
           latestBookFilename: bibleFilename,
+          loadingDocument: false,
         );
 
   /// Latest epub file which was loaded in Epub controller.
@@ -38,6 +40,9 @@ class PositionState extends Equatable {
   final String?
       epubCfi; // TODO make Map<String, String?> to store latest cfi for each epub file?
 
+  /// True when EpubController is loading a new document from file.
+  final bool loadingDocument;
+
   bool get latestBookIsScripture =>
       latestBookFilename == bibleFilename || latestBookFilename == bofmFilename;
 
@@ -48,5 +53,6 @@ class PositionState extends Equatable {
         scriptureBookIndex,
         chapterIndex,
         epubCfi,
+        loadingDocument,
       ];
 }

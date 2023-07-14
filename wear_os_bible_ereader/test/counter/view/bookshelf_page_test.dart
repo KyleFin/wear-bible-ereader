@@ -4,16 +4,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-import 'package:wear_os_bible_ereader/counter/counter.dart';
+import 'package:wear_os_bible_ereader/bookshelf/bookshelf.dart';
 
 import '../../helpers/helpers.dart';
 
-class MockCounterCubit extends MockCubit<int> implements PositionCubit {}
+class MockPositionCubit extends MockCubit<int> implements PositionCubit {}
 
 void main() {
-  group('CounterPage', () {
+  group('BookshelfPage', () {
     testWidgets('renders CounterView', (tester) async {
-      await tester.pumpApp(const CounterPage());
+      await tester.pumpApp(const BookshelfPage());
       expect(find.byType(CounterView), findsOneWidget);
     });
   });
@@ -22,7 +22,7 @@ void main() {
     late PositionCubit counterCubit;
 
     setUp(() {
-      counterCubit = MockCounterCubit();
+      counterCubit = MockPositionCubit();
     });
 
     testWidgets('renders current count', (tester) async {
