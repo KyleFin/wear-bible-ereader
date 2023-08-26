@@ -20,11 +20,36 @@ dependencies:
 
 dev_dependencies:
   bloc_test: ^9.1.2
+  flutter_launcher_icons: ^0.11.0
+  flutter_native_splash: ^2.2.15
   flutter_test:
     sdk: flutter
   mocktail: ^0.3.0
   very_good_analysis: ^5.0.0
 
 flutter:
+  assets:
+    - assets/
   uses-material-design: true
   generate: true
+
+flutter_icons:
+  # To regenerate:
+  # dart run flutter_launcher_icons
+  android: "launcher_icon"
+  image_path: "assets/scriptureSpotterIcon.png"
+  min_sdk_android: 30
+
+flutter_native_splash:
+  # This package generates native code to customize Flutter's default white native splash screen
+  # with background color and splash image.
+  # Customize the parameters below, and run the following command in the terminal:
+  # dart run flutter_native_splash:create
+  # To restore Flutter's default white splash screen, run the following command in the terminal:
+  # dart run flutter_native_splash:remove
+
+  color: "#000000"
+
+  # The image parameter allows you to specify an image used in the splash screen.  It must be a
+  # png file and should be sized for 4x pixel density.
+  image: assets/scriptureSpotterIcon.png

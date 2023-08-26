@@ -24,6 +24,8 @@ dependencies:
 
 dev_dependencies:
   bloc_test: ^9.1.1
+  flutter_launcher_icons: ^0.11.0
+  flutter_native_splash: ^2.2.15
   flutter_test:
     sdk: flutter
   mocktail: ^0.3.0
@@ -34,3 +36,10 @@ flutter:
     - assets/
   uses-material-design: true
   generate: true
+
+flutter_icons:
+  # To regenerate:
+  # dart run flutter_launcher_icons
+  android: "launcher_icon"
+  image_path: "assets/scriptureSpotterIcon.png"
+  min_sdk_android: 30

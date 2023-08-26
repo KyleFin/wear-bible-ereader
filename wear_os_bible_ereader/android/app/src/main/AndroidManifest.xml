@@ -2,9 +2,9 @@
     package="com.example.verygoodcore.wear_os_bible_ereader">
     <uses-feature android:name="android.hardware.type.watch" />
    <application
-        android:label="wear_os_bible_ereader"
+        android:label="Reader for Wear OS (Bible included)"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
         <activity
             android:name=".MainActivity"
             android:exported="true"
