@@ -70,7 +70,7 @@ class _EpubAppState extends State<EpubApp> {
         visualDensity: VisualDensity.compact,
         useMaterial3: true,
         colorScheme: const ColorScheme.dark(primary: Colors.white),
-        appBarTheme: const AppBarTheme(color: Color(0xFF13B9FF)),
+        appBarTheme: const AppBarTheme(color: Color.fromARGB(255, 9, 26, 34)),
       ),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
@@ -142,34 +142,153 @@ class BookDetailsPage extends StatelessWidget {
         return context.read<PositionCubit>().popMenu();
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text('Details')),
-        body: Padding(
-          padding: const EdgeInsets.all(8),
-          child: BlocBuilder<PositionCubit, PositionState>(
-            builder: (context, state) {
-              return state.loadingDocument
-                  ? Text('Loading ${state.bookTitle}')
-                  : Stack(
-                      children: [
-                        // Always build EpubView (and sometimes hide it behind menu)
-                        // since it seems to handle all the controller loading and
-                        // listenable notification logic. I originally tried having
-                        // table of contents in a separate page (instead of a Stack)
-                        // but it would never get notified that listenable values
-                        // changed or that the document finished loading. I'm not
-                        // sure if this is the best approach, but it seems to work
-                        // well having an EpubView always in the widget tree (even
-                        // if it's not visible).
-                        EpubView(controller: epubController),
-                        if (state.chapterIndex == null) ...[
-                          Container(
-                              color: Theme.of(context).colorScheme.background),
-                          TableOfContents(epubController: epubController),
-                        ],
-                      ],
-                    );
-            },
-          ),
+        body: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.home),
+                    onPressed: () {},
+                  )
+                ],
+              ),
+              floating: true,
+              automaticallyImplyLeading: false, // No back arrow.
+            ),
+
+            /// UNCOMMENTING THIS AND COMMENTING OUT OTHER SliverToBoxAdapter
+            /// SHOWS HOW THE floating AppBar can work, but it won't work for
+            /// EpubView's nested ScrollablePositionedList.
+            // SliverToBoxAdapter(
+            //   child: Padding(
+            //     padding: const EdgeInsets.all(8),
+            //     child: BlocBuilder<PositionCubit, PositionState>(
+            //       builder: (context, state) {
+            //         return Column(
+            //           children: [
+            //             for (var i = 0; i < 100; i++)
+            //               Text('Loading ${state.bookTitle} $i')
+            //           ],
+            //         );
+            //       },
+            //     ),
+            //   ),
+            // ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: BlocBuilder<PositionCubit, PositionState>(
+                  builder: (context, state) {
+                    return state.loadingDocument
+                        ? Text('Loading ${state.bookTitle}')
+                        : Stack(
+                            children: [
+                              // Always build EpubView (and sometimes hide it behind menu)
+                              // since it seems to handle all the controller loading and
+                              // listenable notification logic. I originally tried having
+                              // table of contents in a separate page (instead of a Stack)
+                              // but it would never get notified that listenable values
+                              // changed or that the document finished loading. I'm not
+                              // sure if this is the best approach, but it seems to work
+                              // well having an EpubView always in the widget tree (even
+                              // if it's not visible).
+
+                              /// CAN'T USE SliverAppBar BECAUSE epub_view _buildLoaded
+                              /// uses ScrollablePositionedList.builder which can't
+                              /// be nested in sliver (need to use delegate)
+                              /// https://youtu.be/LUqDNnv_dh0?t=183
+                              ///
+                              /// shrinkWrap may be possible but won't be acceptable
+                              /// for performance because we'd have the render the
+                              /// entire book
+                              /// https://github.com/flutter/flutter/issues/49899
+                              EpubView(
+                                controller: epubController,
+                                shrinkWrap:
+                                    true, // THIS WILL NOT WORK FOR PERFORMANCE
+
+                                // builders: EpubViewBuilders(
+                                //     builder: (context, builders, state,
+                                //         loadedBuilder, loadingError) {
+                                //       final Widget content = () {
+                                //         switch (state) {
+                                //           case EpubViewLoadingState.loading:
+                                //             return KeyedSubtree(
+                                //               key: const Key(
+                                //                   'epubx.root.loading'),
+                                //               child: builders.loaderBuilder
+                                //                       ?.call(context) ??
+                                //                   const SizedBox(),
+                                //             );
+                                //           case EpubViewLoadingState.error:
+                                //             return KeyedSubtree(
+                                //               key:
+                                //                   const Key('epubx.root.error'),
+                                //               child: Padding(
+                                //                 padding:
+                                //                     const EdgeInsets.all(32),
+                                //                 child: builders.errorBuilder
+                                //                         ?.call(context,
+                                //                             loadingError!) ??
+                                //                     Center(
+                                //                         child: Text(loadingError
+                                //                             .toString())),
+                                //               ),
+                                //             );
+                                //           case EpubViewLoadingState.success:
+                                //             return KeyedSubtree(
+                                //               key: const Key(
+                                //                   'epubx.root.success'),
+                                //               child: loadedBuilder(context),
+                                //             );
+                                //         }
+                                //       }();
+
+                                //       final defaultBuilder = builders
+                                //           as EpubViewBuilders<
+                                //               DefaultBuilderOptions>;
+                                //       final options = defaultBuilder.options;
+
+                                //       return AnimatedSwitcher(
+                                //         duration: options.loaderSwitchDuration,
+                                //         transitionBuilder:
+                                //             options.transitionBuilder,
+                                //         child: content,
+                                //       );
+                                //     },
+                                //     options: DefaultBuilderOptions(
+                                //       loaderSwitchDuration:
+                                //           const Duration(seconds: 1),
+                                //       transitionBuilder: (Widget child,
+                                //               Animation<double> animation) =>
+                                //           FadeTransition(
+                                //               opacity: animation, child: child),
+                                //       chapterPadding: const EdgeInsets.all(8),
+                                //       paragraphPadding:
+                                //           const EdgeInsets.symmetric(
+                                //               horizontal: 16),
+                                //       textStyle: const TextStyle(
+                                //         height: 1.25,
+                                //         fontSize: 16,
+                                //       ),
+                                //     )),
+                              ),
+                              if (state.chapterIndex == null) ...[
+                                Container(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .background),
+                                TableOfContents(epubController: epubController),
+                              ],
+                            ],
+                          );
+                  },
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
