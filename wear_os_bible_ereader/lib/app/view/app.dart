@@ -241,10 +241,16 @@ class TableOfContents extends StatelessWidget {
     // Non-scripture books display all chapters and sub-chapters in one menu.
     return EpubViewTableOfContents(
       controller: epubController,
-      itemBuilder: (context, index, chapter, itemCount) => ListTile(
-        title: Text(chapter.title!.trim()),
-        onTap: () =>
-            context.read<PositionCubit>().selectChapter(chapter.startIndex),
+      itemBuilder: (context, index, chapter, itemCount) => Column(
+        children: [
+          if (index == 0) verticalSpacer,
+          ListTile(
+            title: Text(chapter.title!.trim()),
+            onTap: () =>
+                context.read<PositionCubit>().selectChapter(chapter.startIndex),
+          ),
+          if (index == itemCount - 1) verticalSpacer,
+        ],
       ),
     );
   }
@@ -255,6 +261,11 @@ class ScriptureSelectionMenu extends StatelessWidget {
   const ScriptureSelectionMenu({required this.epubController, super.key});
 
   static const int newTestamentStartingIndexInTableOfContents = 969;
+  static const _scriptureChaptersSpacerRow = <Widget>[
+    verticalSpacer,
+    verticalSpacer,
+    verticalSpacer
+  ];
 
   final EpubController epubController;
 
@@ -287,13 +298,26 @@ class ScriptureSelectionMenu extends StatelessWidget {
                     final chapter = data[index];
                     return chapter.type == 'chapter' &&
                             _shouldIncludeBook(cubit.state.bookTitle, index)
-                        ? ListTile(
-                            title: Text(chapter.title!.trim()),
-                            // Skip chapter selection if less than 2 subchapters
-                            onTap: data[index + 1].type == 'chapter' ||
-                                    data[index + 2].type == 'chapter'
-                                ? () => cubit.selectChapter(chapter.startIndex)
-                                : () => cubit.setScriptureBookIndex(index),
+                        ? Column(
+                            children: [
+                              if (index == 0 ||
+                                  index ==
+                                      newTestamentStartingIndexInTableOfContents)
+                                verticalSpacer,
+                              ListTile(
+                                title: Text(chapter.title!.trim()),
+                                // Skip chapter selection if less than 2 subchapters
+                                onTap: data[index + 1].type == 'chapter' ||
+                                        data[index + 2].type == 'chapter'
+                                    ? () =>
+                                        cubit.selectChapter(chapter.startIndex)
+                                    : () => cubit.setScriptureBookIndex(index),
+                              ),
+                              if (data[index].title == 'Malachi' ||
+                                  data[index].title == 'Revelation' ||
+                                  data[index].title == 'The Book Of Moroni')
+                                verticalSpacer,
+                            ],
                           )
                         : const SizedBox.shrink();
                   },
@@ -303,7 +327,9 @@ class ScriptureSelectionMenu extends StatelessWidget {
               : GridView.count(
                   crossAxisCount: 3,
                   children: () {
-                    final chaptersInBook = <Widget>[];
+                    final chaptersInBook = <Widget>[
+                      ..._scriptureChaptersSpacerRow
+                    ];
                     var i = cubit.state.scriptureBookIndex! + 1;
                     var foundNextBook = false;
 
@@ -333,6 +359,7 @@ class ScriptureSelectionMenu extends StatelessWidget {
                       }
                       i++;
                     }
+                    chaptersInBook.addAll(_scriptureChaptersSpacerRow);
                     return chaptersInBook;
                   }(),
                 );

@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wear_os_bible_ereader/bookshelf/bookshelf.dart';
 import 'package:wear_os_bible_ereader/l10n/l10n.dart';
 
+const verticalSpacer = SizedBox(height: 30);
+
 class BookshelfPage extends StatelessWidget {
   const BookshelfPage({super.key});
 
@@ -25,13 +27,15 @@ class BookshelfPage extends StatelessWidget {
           return ListView(
             // mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(l10n.libraryAppBarTitle),
+              verticalSpacer,
+              // Text(l10n.libraryAppBarTitle),
               const SizedBox(height: 10),
               for (final t in [...titleToFilename.keys, ...snapshot.data!])
                 ElevatedButton(
                   onPressed: () => cubit.openBook(t),
                   child: Text(t),
                 ),
+              verticalSpacer,
             ],
           );
         },
