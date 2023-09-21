@@ -3,6 +3,7 @@ import 'package:epub_view/epub_view.dart';
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wear_os_bible_ereader/bookshelf/bloc/settings_cubit.dart';
 import 'package:wear_os_bible_ereader/bookshelf/bookshelf.dart';
 import 'package:wear_os_bible_ereader/l10n/l10n.dart';
 
@@ -18,8 +19,15 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return RepositoryProvider.value(
       value: bookshelfRepository,
-      child: BlocProvider(
-        create: (_) => PositionCubit(bookshelfRepository),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<PositionCubit>(
+            create: (_) => PositionCubit(bookshelfRepository),
+          ),
+          BlocProvider<SettingsCubit>(
+            create: (_) => SettingsCubit(),
+          ),
+        ],
         child: const EpubApp(),
       ),
     );
@@ -70,7 +78,7 @@ class _EpubAppState extends State<EpubApp> {
         visualDensity: VisualDensity.compact,
         useMaterial3: true,
         colorScheme: const ColorScheme.dark(primary: Colors.white),
-        appBarTheme: const AppBarTheme(color: Color(0xFF13B9FF)),
+        appBarTheme: const AppBarTheme(color: Color.fromARGB(255, 9, 26, 34)),
       ),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
@@ -142,31 +150,36 @@ class BookDetailsPage extends StatelessWidget {
         return context.read<PositionCubit>().popMenu();
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text('Details')),
+        appBar: const _AnimatedAppBar(),
         body: Padding(
           padding: const EdgeInsets.all(8),
           child: BlocBuilder<PositionCubit, PositionState>(
             builder: (context, state) {
               return state.loadingDocument
                   ? Text('Loading ${state.bookTitle}')
-                  : Stack(
-                      children: [
-                        // Always build EpubView (and sometimes hide it behind menu)
-                        // since it seems to handle all the controller loading and
-                        // listenable notification logic. I originally tried having
-                        // table of contents in a separate page (instead of a Stack)
-                        // but it would never get notified that listenable values
-                        // changed or that the document finished loading. I'm not
-                        // sure if this is the best approach, but it seems to work
-                        // well having an EpubView always in the widget tree (even
-                        // if it's not visible).
-                        EpubView(controller: epubController),
-                        if (state.chapterIndex == null) ...[
-                          Container(
-                              color: Theme.of(context).colorScheme.background),
-                          TableOfContents(epubController: epubController),
+                  : GestureDetector(
+                      onDoubleTap: () =>
+                          context.read<SettingsCubit>().toggleAppBarIsVisible(),
+                      child: Stack(
+                        children: [
+                          // Always build EpubView (and sometimes hide it behind menu)
+                          // since it seems to handle all the controller loading and
+                          // listenable notification logic. I originally tried having
+                          // table of contents in a separate page (instead of a Stack)
+                          // but it would never get notified that listenable values
+                          // changed or that the document finished loading. I'm not
+                          // sure if this is the best approach, but it seems to work
+                          // well having an EpubView always in the widget tree (even
+                          // if it's not visible).
+                          EpubView(controller: epubController),
+                          if (state.chapterIndex == null) ...[
+                            Container(
+                                color:
+                                    Theme.of(context).colorScheme.background),
+                            TableOfContents(epubController: epubController),
+                          ],
                         ],
-                      ],
+                      ),
                     );
             },
           ),
@@ -174,6 +187,40 @@ class BookDetailsPage extends StatelessWidget {
       ),
     );
   }
+}
+
+class _AnimatedAppBar extends StatelessWidget implements PreferredSizeWidget {
+  /// Cross-fades transition to show/hide app bar.
+  const _AnimatedAppBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedCrossFade(
+      duration: const Duration(milliseconds: 100),
+      crossFadeState:
+          context.select((SettingsCubit c) => c.state.appBarIsVisible)
+              ? CrossFadeState.showFirst
+              : CrossFadeState.showSecond,
+      firstChild: AppBar(
+        automaticallyImplyLeading: false,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.home),
+              onPressed: () {
+                context.read<PositionCubit>().closeBook();
+              },
+            )
+          ],
+        ),
+      ),
+      secondChild: const SizedBox.shrink(),
+    );
+  }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(50);
 }
 
 // MAY BE EASIER to get (sub)chapters directly from controller.document
