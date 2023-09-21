@@ -150,21 +150,7 @@ class BookDetailsPage extends StatelessWidget {
         return context.read<PositionCubit>().popMenu();
       },
       child: Scaffold(
-        appBar: context.select((SettingsCubit c) => c.state.appBarIsVisible)
-            ? AppBar(
-                automaticallyImplyLeading: false,
-                title: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.home),
-                      onPressed: () {
-                        context.read<PositionCubit>().closeBook();
-                      },
-                    )
-                  ],
-                ))
-            : null,
+        appBar: const _AnimatedAppBar(),
         body: Padding(
           padding: const EdgeInsets.all(8),
           child: BlocBuilder<PositionCubit, PositionState>(
@@ -201,6 +187,40 @@ class BookDetailsPage extends StatelessWidget {
       ),
     );
   }
+}
+
+class _AnimatedAppBar extends StatelessWidget implements PreferredSizeWidget {
+  /// Cross-fades transition to show/hide app bar.
+  const _AnimatedAppBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedCrossFade(
+      duration: const Duration(milliseconds: 100),
+      crossFadeState:
+          context.select((SettingsCubit c) => c.state.appBarIsVisible)
+              ? CrossFadeState.showFirst
+              : CrossFadeState.showSecond,
+      firstChild: AppBar(
+        automaticallyImplyLeading: false,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.home),
+              onPressed: () {
+                context.read<PositionCubit>().closeBook();
+              },
+            )
+          ],
+        ),
+      ),
+      secondChild: const SizedBox.shrink(),
+    );
+  }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(50);
 }
 
 // MAY BE EASIER to get (sub)chapters directly from controller.document
