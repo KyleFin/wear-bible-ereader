@@ -1,5 +1,5 @@
-import 'package:android_companion_for_wear_os_ereader/counter/counter.dart';
 import 'package:android_companion_for_wear_os_ereader/l10n/l10n.dart';
+import 'package:android_companion_for_wear_os_ereader/transfer/transfer.dart';
 import 'package:bookshelf_repository/bookshelf_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -28,14 +28,14 @@ class AppView extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        appBarTheme: const AppBarTheme(color: Color(0xFF13B9FF)),
-        colorScheme: ColorScheme.fromSwatch(
-          accentColor: const Color(0xFF13B9FF),
+        appBarTheme: const AppBarTheme(color: Color(0xFFFFF380)),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFFFFF380),
         ),
       ),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: const CounterPage(),
+      home: const TransferPage(),
     );
   }
 }

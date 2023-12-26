@@ -1,4 +1,4 @@
-import 'package:android_companion_for_wear_os_ereader/counter/counter.dart';
+import 'package:android_companion_for_wear_os_ereader/transfer/transfer.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,18 +7,18 @@ import 'package:mocktail/mocktail.dart';
 
 import '../../helpers/helpers.dart';
 
-class MockCounterCubit extends MockCubit<int> implements CounterCubit {}
+class MockCounterCubit extends MockCubit<int> implements TransferCubit {}
 
 void main() {
   group('CounterPage', () {
     testWidgets('renders CounterView', (tester) async {
-      await tester.pumpApp(const CounterPage());
-      expect(find.byType(CounterView), findsOneWidget);
+      await tester.pumpApp(const TransferPage());
+      expect(find.byType(TransferView), findsOneWidget);
     });
   });
 
   group('CounterView', () {
-    late CounterCubit counterCubit;
+    late TransferCubit counterCubit;
 
     setUp(() {
       counterCubit = MockCounterCubit();
@@ -30,7 +30,7 @@ void main() {
       await tester.pumpApp(
         BlocProvider.value(
           value: counterCubit,
-          child: const CounterView(),
+          child: const TransferView(),
         ),
       );
       expect(find.text('$state'), findsOneWidget);
@@ -43,7 +43,7 @@ void main() {
       await tester.pumpApp(
         BlocProvider.value(
           value: counterCubit,
-          child: const CounterView(),
+          child: const TransferView(),
         ),
       );
       await tester.tap(find.byIcon(Icons.add));
@@ -57,7 +57,7 @@ void main() {
       await tester.pumpApp(
         BlocProvider.value(
           value: counterCubit,
-          child: const CounterView(),
+          child: const TransferView(),
         ),
       );
       await tester.tap(find.byIcon(Icons.remove));
