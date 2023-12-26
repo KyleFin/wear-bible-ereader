@@ -49,8 +49,30 @@ flutter_native_splash:
   # To restore Flutter's default white splash screen, run the following command in the terminal:
   # dart run flutter_native_splash:remove
 
-  color: "#000000"
+  color: "#fff380"
 
   # The image parameter allows you to specify an image used in the splash screen.  It must be a
   # png file and should be sized for 4x pixel density.
   image: assets/scriptureSpotterIcon.png
+
+  # Android 12 handles the splash screen differently than previous versions.  Please visit
+  # https://developer.android.com/guide/topics/ui/splash-screen
+  # Following are Android 12 specific parameter.
+  android_12:
+    image: assets/android12ScriptureSpotterIcon.png
+    color: "#fff380"
+
+    # App icon background color.
+    #icon_background_color: "#111111"
+
+    # The branding property allows you to specify an image used as branding in the splash screen.
+    #branding: assets/dart.png
+
+    # The image_dark, color_dark, icon_background_color_dark, and branding_dark set values that
+    # apply when the device is in dark mode. If they are not specified, the app will use the
+    # parameters from above.
+    #image_dark: assets/android12splash-invert.png
+    #color_dark: "#042a49"
+    #icon_background_color_dark: "#eeeeee"
+  ios: false
+  web: false
