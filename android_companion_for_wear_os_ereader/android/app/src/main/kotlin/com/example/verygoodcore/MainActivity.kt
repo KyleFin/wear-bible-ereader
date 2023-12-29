@@ -1,4 +1,4 @@
-package com.example.verygoodcore.android_companion_for_wear_os_ereader
+package com.finlinson.wear_os_bible_ereader
 
 import io.flutter.embedding.android.FlutterActivity
 

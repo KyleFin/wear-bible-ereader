@@ -32,7 +32,7 @@ apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
-    namespace "com.example.verygoodcore.android_companion_for_wear_os_ereader"
+    namespace "com.finlinson.wear_os_bible_ereader"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
@@ -51,7 +51,7 @@ android {
 
     defaultConfig {
         // Companion and wear app use same appID so they share Data Layer.
-        applicationId "com.example.verygoodcore.wear_os_bible_ereader"
+        applicationId "com.finlinson.wear_os_bible_ereader"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion flutter.minSdkVersion

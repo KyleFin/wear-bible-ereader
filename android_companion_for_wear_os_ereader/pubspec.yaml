@@ -1,6 +1,6 @@
 name: android_companion_for_wear_os_ereader
-description: A Very Good Project created by Very Good CLI.
-version: 1.0.0+1
+description: A Wear OS app for reading epub books on the go.
+version: 1.0.0+3
 publish_to: none
 
 environment:
