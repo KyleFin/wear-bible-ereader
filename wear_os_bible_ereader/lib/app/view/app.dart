@@ -3,6 +3,7 @@ import 'package:epub_view/epub_view.dart';
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wear_os_bible_ereader/app/view/rotary_scrollable.dart';
 import 'package:wear_os_bible_ereader/bookshelf/bloc/settings_cubit.dart';
 import 'package:wear_os_bible_ereader/bookshelf/bookshelf.dart';
 import 'package:wear_os_bible_ereader/l10n/l10n.dart';
@@ -89,7 +90,7 @@ class _EpubAppState extends State<EpubApp> {
                   .read<BookshelfRepository>()
                   .titlesAndFilepaths[current.bookTitle];
           final openNewBookRequired = currBookFilename != null &&
-              // TODO Verify with tests (did with breakpoints).
+              // TODO: Verify with tests (did with breakpoints).
               // Only change controller if opening a different book.
               currBookFilename != current.latestBookFilename;
           final scrollToNewLocationRequired =
@@ -174,8 +175,8 @@ class BookDetailsPage extends StatelessWidget {
                           EpubView(controller: epubController),
                           if (state.chapterIndex == null) ...[
                             Container(
-                                color:
-                                    Theme.of(context).colorScheme.background),
+                              color: Theme.of(context).colorScheme.background,
+                            ),
                             TableOfContents(epubController: epubController),
                           ],
                         ],
@@ -211,7 +212,7 @@ class _AnimatedAppBar extends StatelessWidget implements PreferredSizeWidget {
               onPressed: () {
                 context.read<PositionCubit>().closeBook();
               },
-            )
+            ),
           ],
         ),
       ),
@@ -264,7 +265,7 @@ class ScriptureSelectionMenu extends StatelessWidget {
   static const _scriptureChaptersSpacerRow = <Widget>[
     verticalSpacer,
     verticalSpacer,
-    verticalSpacer
+    verticalSpacer,
   ];
 
   final EpubController epubController;
@@ -291,77 +292,86 @@ class ScriptureSelectionMenu extends StatelessWidget {
           // (data's type) is private within epub_view.
           content = cubit.state.scriptureBookIndex == null
               // Book selection menu
-              ? ListView.builder(
-                  // padding: padding,
-                  key: Key('$runtimeType.content'),
-                  itemBuilder: (context, index) {
-                    final chapter = data[index];
-                    return chapter.type == 'chapter' &&
-                            _shouldIncludeBook(cubit.state.bookTitle, index)
-                        ? Column(
-                            children: [
-                              if (index == 0 ||
-                                  index ==
-                                      newTestamentStartingIndexInTableOfContents)
-                                verticalSpacer,
-                              ListTile(
-                                title: Text(chapter.title!.trim()),
-                                // Skip chapter selection if less than 2 subchapters
-                                onTap: data[index + 1].type == 'chapter' ||
-                                        data[index + 2].type == 'chapter'
-                                    ? () =>
-                                        cubit.selectChapter(chapter.startIndex)
-                                    : () => cubit.setScriptureBookIndex(index),
-                              ),
-                              if (data[index].title == 'Malachi' ||
-                                  data[index].title == 'Revelation' ||
-                                  data[index].title == 'The Book Of Moroni')
-                                verticalSpacer,
-                            ],
-                          )
-                        : const SizedBox.shrink();
-                  },
-                  itemCount: data.length,
+              ? RotaryScrollable(
+                  childBuilder: (scrollController) => ListView.builder(
+                    // padding: padding,
+                    key: Key('$runtimeType.content'),
+                    controller: scrollController,
+                    itemBuilder: (context, index) {
+                      final chapter = data[index];
+                      return chapter.type == 'chapter' &&
+                              _shouldIncludeBook(cubit.state.bookTitle, index)
+                          ? Column(
+                              children: [
+                                if (index == 0 ||
+                                    index ==
+                                        newTestamentStartingIndexInTableOfContents)
+                                  verticalSpacer,
+                                ListTile(
+                                  title: Text(chapter.title!.trim()),
+                                  // Skip chapter selection if less than 2 subchapters
+                                  onTap: data[index + 1].type == 'chapter' ||
+                                          data[index + 2].type == 'chapter'
+                                      ? () => cubit
+                                          .selectChapter(chapter.startIndex)
+                                      : () =>
+                                          cubit.setScriptureBookIndex(index),
+                                ),
+                                if (data[index].title == 'Malachi' ||
+                                    data[index].title == 'Revelation' ||
+                                    data[index].title == 'The Book Of Moroni')
+                                  verticalSpacer,
+                              ],
+                            )
+                          : const SizedBox.shrink();
+                    },
+                    itemCount: data.length,
+                  ),
                 )
               // Chapter selection menu
-              : GridView.count(
-                  crossAxisCount: 3,
-                  children: () {
-                    final chaptersInBook = <Widget>[
-                      ..._scriptureChaptersSpacerRow
-                    ];
-                    var i = cubit.state.scriptureBookIndex! + 1;
-                    var foundNextBook = false;
+              : RotaryScrollable(
+                  childBuilder: (scrollController) => GridView.count(
+                    crossAxisCount: 3,
+                    controller: scrollController,
+                    children: () {
+                      final chaptersInBook = <Widget>[
+                        ..._scriptureChaptersSpacerRow
+                      ];
+                      var i = cubit.state.scriptureBookIndex! + 1;
+                      var foundNextBook = false;
 
-                    final originalIndex = i;
-                    final startIndexForBook =
-                        data[originalIndex - 1].startIndex;
+                      final originalIndex = i;
+                      final startIndexForBook =
+                          data[originalIndex - 1].startIndex;
 
-                    while (i < data.length && !foundNextBook) {
-                      final chapter = data[i];
-                      final currIndex = i;
-                      if (chapter.type == 'subchapter') {
-                        chaptersInBook.add(
-                          ListTile(
-                            title: Text(chapter.title!.trim().split(' ').last),
-                            onTap: () => cubit.selectChapter(
-                              // Fix Bible chapter 1 startIndex == chapter 2 by
-                              // having chapter 1 instead go to start of book.
-                              cubit.state.latestBookFilename == bibleFilename &&
-                                      currIndex == originalIndex
-                                  ? startIndexForBook
-                                  : chapter.startIndex,
+                      while (i < data.length && !foundNextBook) {
+                        final chapter = data[i];
+                        final currIndex = i;
+                        if (chapter.type == 'subchapter') {
+                          chaptersInBook.add(
+                            ListTile(
+                              title:
+                                  Text(chapter.title!.trim().split(' ').last),
+                              onTap: () => cubit.selectChapter(
+                                // Fix Bible chapter 1 startIndex == chapter 2 by
+                                // having chapter 1 instead go to start of book.
+                                cubit.state.latestBookFilename ==
+                                            bibleFilename &&
+                                        currIndex == originalIndex
+                                    ? startIndexForBook
+                                    : chapter.startIndex,
+                              ),
                             ),
-                          ),
-                        );
-                      } else {
-                        foundNextBook = true;
+                          );
+                        } else {
+                          foundNextBook = true;
+                        }
+                        i++;
                       }
-                      i++;
-                    }
-                    chaptersInBook.addAll(_scriptureChaptersSpacerRow);
-                    return chaptersInBook;
-                  }(),
+                      chaptersInBook.addAll(_scriptureChaptersSpacerRow);
+                      return chaptersInBook;
+                    }(),
+                  ),
                 );
         } else {
           content = KeyedSubtree(

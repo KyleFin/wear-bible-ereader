@@ -135,7 +135,7 @@ const newTestament = 'New Testament';
 const bookOfMormon = 'Book of Mormon';
 
 // These versions support chapters in table of contents and scrollTo.
-/// http://www.mobileread.mobi/forums/showthread.php?t=31709
+/// https://www.mobileread.com/forums/showthread.php?t=31709
 const bibleFilename = 'kjvCh.epub';
 
 /// https://www.globalgreyebooks.com/book-of-mormon-ebook.html

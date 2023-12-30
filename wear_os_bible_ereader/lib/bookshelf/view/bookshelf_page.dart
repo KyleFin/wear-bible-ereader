@@ -1,6 +1,7 @@
 import 'package:bookshelf_repository/bookshelf_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wear_os_bible_ereader/app/view/rotary_scrollable.dart';
 import 'package:wear_os_bible_ereader/bookshelf/bookshelf.dart';
 import 'package:wear_os_bible_ereader/l10n/l10n.dart';
 
@@ -24,19 +25,23 @@ class BookshelfPage extends StatelessWidget {
         initialData: bookshelfRepository.titlesAndFilepaths.keys,
         stream: bookshelfRepository.titlesAndFilepathsStream.map((t) => t.keys),
         builder: (context, snapshot) {
-          return ListView(
-            // mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              verticalSpacer,
-              // Text(l10n.libraryAppBarTitle),
-              const SizedBox(height: 10),
-              for (final t in [...titleToFilename.keys, ...snapshot.data!])
-                ElevatedButton(
-                  onPressed: () => cubit.openBook(t),
-                  child: Text(t),
-                ),
-              verticalSpacer,
-            ],
+          // TODO: Only respond to rotary scrolls if bookshelf is displayed.
+          return RotaryScrollable(
+            childBuilder: (scrollController) => ListView(
+              // mainAxisAlignment: MainAxisAlignment.center,
+              controller: scrollController,
+              children: [
+                verticalSpacer,
+                // Text(l10n.libraryAppBarTitle),
+                const SizedBox(height: 10),
+                for (final t in [...titleToFilename.keys, ...snapshot.data!])
+                  ElevatedButton(
+                    onPressed: () => cubit.openBook(t),
+                    child: Text(t),
+                  ),
+                verticalSpacer,
+              ],
+            ),
           );
         },
       ),

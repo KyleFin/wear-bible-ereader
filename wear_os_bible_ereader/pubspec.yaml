@@ -20,6 +20,7 @@ dependencies:
     sdk: flutter
   intl: ^0.18.0
   meta: ^1.9.1
+  rotary_scrollbar: ^0.1.1
   wear: ^1.1.0
   wearable_rotary: ^2.0.0
 
