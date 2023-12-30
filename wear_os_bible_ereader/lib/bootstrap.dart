@@ -2,7 +2,8 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/widgets.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:path_provider/path_provider.dart';
 
 class AppBlocObserver extends BlocObserver {
   const AppBlocObserver();
@@ -31,6 +32,10 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
     () async {
       // Add cross-flavor configuration here
 
+      WidgetsFlutterBinding.ensureInitialized();
+      HydratedBloc.storage = await HydratedStorage.build(
+        storageDirectory: await getApplicationDocumentsDirectory(),
+      );
       runApp(await builder());
     },
     (error, stackTrace) => log(error.toString(), stackTrace: stackTrace),
