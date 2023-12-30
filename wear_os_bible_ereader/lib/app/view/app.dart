@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bookshelf_repository/bookshelf_repository.dart';
 import 'package:epub_view/epub_view.dart';
 import 'package:flow_builder/flow_builder.dart';
@@ -7,6 +9,7 @@ import 'package:wear_os_bible_ereader/app/view/rotary_scrollable.dart';
 import 'package:wear_os_bible_ereader/bookshelf/bloc/settings_cubit.dart';
 import 'package:wear_os_bible_ereader/bookshelf/bookshelf.dart';
 import 'package:wear_os_bible_ereader/l10n/l10n.dart';
+import 'package:wearable_rotary/wearable_rotary.dart';
 
 class App extends StatelessWidget {
   App({required this.bookshelfRepository, super.key}) {
@@ -44,10 +47,9 @@ class EpubApp extends StatefulWidget {
 
 class _EpubAppState extends State<EpubApp> {
   List<Page> onGeneratePages(PositionState state, List<Page> pages) {
-    final selectedBook = state.bookTitle;
     return [
       BookshelfPage.page(),
-      if (selectedBook != null)
+      if (state.bookIsSelected)
         BookDetailsPage.page(epubController: _epubReaderController),
     ];
   }
@@ -161,30 +163,83 @@ class BookDetailsPage extends StatelessWidget {
                   : GestureDetector(
                       onDoubleTap: () =>
                           context.read<SettingsCubit>().toggleAppBarIsVisible(),
-                      child: Stack(
-                        children: [
-                          // Always build EpubView (and sometimes hide it behind menu)
-                          // since it seems to handle all the controller loading and
-                          // listenable notification logic. I originally tried having
-                          // table of contents in a separate page (instead of a Stack)
-                          // but it would never get notified that listenable values
-                          // changed or that the document finished loading. I'm not
-                          // sure if this is the best approach, but it seems to work
-                          // well having an EpubView always in the widget tree (even
-                          // if it's not visible).
-                          EpubView(controller: epubController),
-                          if (state.chapterIndex == null) ...[
-                            Container(
-                              color: Theme.of(context).colorScheme.background,
-                            ),
-                            TableOfContents(epubController: epubController),
-                          ],
-                        ],
-                      ),
+                      child: _BookDetails(epubController: epubController),
                     );
             },
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _BookDetails extends StatefulWidget {
+  const _BookDetails({required this.epubController});
+
+  final EpubController epubController;
+
+  @override
+  State<_BookDetails> createState() => _BookDetailsState();
+}
+
+class _BookDetailsState extends State<_BookDetails> {
+  // TODO: Expose a scrollOffsetController from epubController so we can scroll
+  // by offset instead of by index.
+  static const _epubRotaryScrollDuration = Duration(milliseconds: 800);
+  late final StreamSubscription<RotaryEvent> rotarySubscription;
+  bool _epubControllerShouldRespondToRotaryEvent = true;
+
+  @override
+  void initState() {
+    super.initState();
+    rotarySubscription = rotaryEvents.listen((RotaryEvent event) {
+      if (!_epubControllerShouldRespondToRotaryEvent) return;
+
+      final step = switch (event.direction) {
+        RotaryDirection.clockwise => 1,
+        RotaryDirection.counterClockwise => -1
+      };
+      final c = widget.epubController;
+      c.scrollTo(
+        index: c.currentValue!.position.index + step,
+        duration: _epubRotaryScrollDuration,
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    rotarySubscription.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<PositionCubit, PositionState>(
+      listener: (context, state) {
+        _epubControllerShouldRespondToRotaryEvent = state.chapterIsSelected;
+        // TODO: Rotary scroll in non-scripture TOC.
+        // || (state.bookIsSelected && !state.bookTitleIsScripture);
+      },
+      child: Stack(
+        children: [
+          // Always build EpubView (and sometimes hide it behind menu)
+          // since it seems to handle all the controller loading and
+          // listenable notification logic. I originally tried having
+          // table of contents in a separate page (instead of a Stack)
+          // but it would never get notified that listenable values
+          // changed or that the document finished loading. I'm not
+          // sure if this is the best approach, but it seems to work
+          // well having an EpubView always in the widget tree (even
+          // if it's not visible).
+          EpubView(controller: widget.epubController),
+          if (context.read<PositionCubit>().state.chapterIndex == null) ...[
+            Container(
+              color: Theme.of(context).colorScheme.background,
+            ),
+            TableOfContents(epubController: widget.epubController),
+          ],
+        ],
       ),
     );
   }

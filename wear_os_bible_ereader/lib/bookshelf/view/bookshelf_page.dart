@@ -19,64 +19,35 @@ class BookshelfPage extends StatelessWidget {
     final l10n = context.l10n;
     final cubit = context.read<PositionCubit>();
     final bookshelfRepository = context.read<BookshelfRepository>();
-    return //state.bookTitle == null ?
-        Scaffold(
+    return Scaffold(
       body: StreamBuilder<Iterable<String>>(
         initialData: bookshelfRepository.titlesAndFilepaths.keys,
         stream: bookshelfRepository.titlesAndFilepathsStream.map((t) => t.keys),
         builder: (context, snapshot) {
-          // TODO: Only respond to rotary scrolls if bookshelf is displayed.
-          return RotaryScrollable(
-            childBuilder: (scrollController) => ListView(
-              // mainAxisAlignment: MainAxisAlignment.center,
-              controller: scrollController,
-              children: [
-                verticalSpacer,
-                // Text(l10n.libraryAppBarTitle),
-                const SizedBox(height: 10),
-                for (final t in [...titleToFilename.keys, ...snapshot.data!])
-                  ElevatedButton(
-                    onPressed: () => cubit.openBook(t),
-                    child: Text(t),
+          return context.select((PositionCubit c) => c.state.bookTitle != null)
+              ? const SizedBox()
+              // Only respond to rotary scrolls if bookshelf is displayed.
+              : RotaryScrollable(
+                  childBuilder: (scrollController) => ListView(
+                    controller: scrollController,
+                    children: [
+                      verticalSpacer,
+                      // Text(l10n.libraryAppBarTitle),
+                      const SizedBox(height: 10),
+                      for (final t in [
+                        ...titleToFilename.keys,
+                        ...snapshot.data!,
+                      ])
+                        ElevatedButton(
+                          onPressed: () => cubit.openBook(t),
+                          child: Text(t),
+                        ),
+                      verticalSpacer,
+                    ],
                   ),
-                verticalSpacer,
-              ],
-            ),
-          );
+                );
         },
       ),
-      // const CounterText(),
-      // const SizedBox(height: 10),
-      // ),
-      // : state.bookIsLoading
-      //     ? const Text('Loading')
-      //     :
-      //     // EpubViewTableOfContents()
-      //     ListView(
-      //         // mainAxisAlignment: MainAxisAlignment.center,
-      //         children: [
-      //           for (final c in cubit.chapters())
-      //             ElevatedButton(
-      //               onPressed: () => cubit.openBook(c),
-      //               child: Text(c),
-      //             ),
-      //           const SizedBox(height: 10),
-      //           Text(l10n.libraryAppBarTitle),
-      //           const CounterText(),
-      //           const SizedBox(height: 10),
-      //         ],
-      //       );
     );
-  }
-}
-
-class CounterText extends StatelessWidget {
-  const CounterText({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final count = context.select((PositionCubit cubit) => cubit.state);
-    return Text('$count', style: theme.textTheme.displayLarge);
   }
 }

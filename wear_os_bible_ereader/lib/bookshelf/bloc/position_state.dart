@@ -43,8 +43,16 @@ class PositionState extends Equatable {
   /// True when EpubController is loading a new document from file.
   final bool loadingDocument;
 
+  /// True when a chapter from Table of Contents has been selected.
+  bool get chapterIsSelected => chapterIndex != null;
+
+  /// True when a book from bookshelf has been selected.
+  bool get bookIsSelected => bookTitle != null;
+
   bool get latestBookIsScripture =>
       latestBookFilename == bibleFilename || latestBookFilename == bofmFilename;
+
+  bool get bookTitleIsScripture => titleToFilename.keys.contains(bookTitle);
 
   @override
   List<Object?> get props => [
