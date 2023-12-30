@@ -183,9 +183,6 @@ class _BookDetails extends StatefulWidget {
 }
 
 class _BookDetailsState extends State<_BookDetails> {
-  // TODO: Expose a scrollOffsetController from epubController so we can scroll
-  // by offset instead of by index.
-  static const _epubRotaryScrollDuration = Duration(milliseconds: 800);
   late final StreamSubscription<RotaryEvent> rotarySubscription;
   bool _epubControllerShouldRespondToRotaryEvent = true;
 
@@ -195,14 +192,11 @@ class _BookDetailsState extends State<_BookDetails> {
     rotarySubscription = rotaryEvents.listen((RotaryEvent event) {
       if (!_epubControllerShouldRespondToRotaryEvent) return;
 
-      final step = switch (event.direction) {
-        RotaryDirection.clockwise => 1,
-        RotaryDirection.counterClockwise => -1
-      };
-      final c = widget.epubController;
-      c.scrollTo(
-        index: c.currentValue!.position.index + step,
-        duration: _epubRotaryScrollDuration,
+      widget.epubController.advance(
+        switch (event.direction) {
+          RotaryDirection.clockwise => 1,
+          RotaryDirection.counterClockwise => -1
+        },
       );
     });
   }
@@ -232,7 +226,7 @@ class _BookDetailsState extends State<_BookDetails> {
           // sure if this is the best approach, but it seems to work
           // well having an EpubView always in the widget tree (even
           // if it's not visible).
-          EpubView(controller: widget.epubController),
+          _EpubViewWithTapToScroll(epubController: widget.epubController),
           if (context.read<PositionCubit>().state.chapterIndex == null) ...[
             Container(
               color: Theme.of(context).colorScheme.background,
@@ -241,6 +235,36 @@ class _BookDetailsState extends State<_BookDetails> {
           ],
         ],
       ),
+    );
+  }
+}
+
+class _EpubViewWithTapToScroll extends StatelessWidget {
+  const _EpubViewWithTapToScroll({required this.epubController});
+
+  static const double _tappableHeight = 48;
+  final EpubController epubController;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        EpubView(controller: epubController),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            for (final step in [-1, 1])
+              SizedBox(
+                height: _tappableHeight,
+                width: double.infinity,
+                child: GestureDetector(
+                  onTap: () => epubController.advance(step),
+                ),
+              ),
+          ],
+        ),
+      ],
     );
   }
 }
@@ -444,4 +468,15 @@ class ScriptureSelectionMenu extends StatelessWidget {
       },
     );
   }
+}
+
+extension on EpubController {
+  // TODO: Expose a scrollOffsetController from epubController so we can scroll
+  // by offset instead of by index.
+  static const _epubScrollDuration = Duration(milliseconds: 800);
+
+  void advance(int indexStep) => scrollTo(
+        index: currentValue!.position.index + indexStep,
+        duration: _epubScrollDuration,
+      );
 }
