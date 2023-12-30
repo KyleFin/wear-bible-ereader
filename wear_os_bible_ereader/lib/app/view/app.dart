@@ -12,10 +12,7 @@ import 'package:wear_os_bible_ereader/l10n/l10n.dart';
 import 'package:wearable_rotary/wearable_rotary.dart';
 
 class App extends StatelessWidget {
-  App({required this.bookshelfRepository, super.key}) {
-    WidgetsFlutterBinding.ensureInitialized();
-    bookshelfRepository.initialize();
-  }
+  const App({required this.bookshelfRepository, super.key});
 
   final BookshelfRepository bookshelfRepository;
 
@@ -32,20 +29,43 @@ class App extends StatelessWidget {
             create: (_) => SettingsCubit(),
           ),
         ],
-        child: const EpubApp(),
+        child: const _EpubAppInitializer(),
       ),
     );
   }
 }
 
-class EpubApp extends StatefulWidget {
-  const EpubApp({super.key});
+class _EpubAppInitializer extends StatelessWidget {
+  const _EpubAppInitializer();
 
   @override
-  State<EpubApp> createState() => _EpubAppState();
+  Widget build(BuildContext context) {
+    return EpubApp(
+      bookshelfRepository: context.read<BookshelfRepository>(),
+      positionCubit: context.read<PositionCubit>(),
+    );
+  }
+}
+
+class EpubApp extends StatefulWidget {
+  const EpubApp({
+    super.key,
+    required this.bookshelfRepository,
+    required this.positionCubit,
+  });
+
+  final BookshelfRepository bookshelfRepository;
+  final PositionCubit positionCubit;
+
+  @override
+  State<EpubApp> createState() => _EpubAppState(
+      bookshelfRepository: bookshelfRepository, positionCubit: positionCubit);
 }
 
 class _EpubAppState extends State<EpubApp> {
+  _EpubAppState(
+      {required this.bookshelfRepository, required this.positionCubit});
+
   List<Page> onGeneratePages(PositionState state, List<Page> pages) {
     return [
       BookshelfPage.page(),
@@ -54,24 +74,52 @@ class _EpubAppState extends State<EpubApp> {
     ];
   }
 
+  final BookshelfRepository bookshelfRepository;
+  final PositionCubit positionCubit;
   late EpubController _epubReaderController;
 
   @override
   void initState() {
     super.initState();
-    _epubReaderController = EpubController(
-      document: EpubDocument.openAsset('assets/kjvCh.epub'),
-      // epubCfi:
-      //     'epubcfi(/6/26[id4]!/4/2/2[id4]/22)', // book.epub Chapter 3 paragraph 10
-      // epubCfi:
-      //     'epubcfi(/6/6[chapter-2]!/4/2/1612)', // book_2.epub Chapter 16 paragraph 3
-    );
+    _preloadLatestBook();
   }
 
   @override
   void dispose() {
     _epubReaderController.dispose();
     super.dispose();
+  }
+
+  Future<void> _preloadLatestBook() async {
+    final positionState = positionCubit.state;
+    final latestBookFilename = positionState.latestBookFilename;
+
+    Future<EpubBook>? document;
+    if (positionState.latestBookIsScripture) {
+      document = EpubDocument.openAsset('assets/$latestBookFilename');
+    } else {
+      if (positionState.bookIsSelected) {
+        // On initial load, book from previous reading may have been deleted.
+        final file =
+            await bookshelfRepository.getBookFile(positionState.bookTitle!);
+        if (file != null) {
+          document = EpubDocument.openFile(file);
+        }
+      }
+      document ??= EpubDocument.openAsset('assets/$bibleFilename');
+    }
+
+    _epubReaderController = EpubController(
+      document: document,
+      // epubCfi:
+      //     'epubcfi(/6/26[id4]!/4/2/2[id4]/22)', // book.epub Chapter 3 paragraph 10
+      // epubCfi:
+      //     'epubcfi(/6/6[chapter-2]!/4/2/1612)', // book_2.epub Chapter 16 paragraph 3
+    );
+
+    if (positionState.chapterIndex != null) {
+      await _epubReaderController.scrollTo(index: positionState.chapterIndex!);
+    }
   }
 
   @override

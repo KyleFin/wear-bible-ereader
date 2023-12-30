@@ -2,10 +2,8 @@ import 'package:bookshelf_repository/bookshelf_repository.dart';
 import 'package:wear_os_bible_ereader/app/app.dart';
 import 'package:wear_os_bible_ereader/bootstrap.dart';
 
-void main() {
-  bootstrap(
-    () => App(
-      bookshelfRepository: FlutterWearOsConnectivityBookshelfRepository(),
-    ),
-  );
+Future<void> main() async {
+  final bookshelfRepository = FlutterWearOsConnectivityBookshelfRepository();
+  await bookshelfRepository.initialize();
+  await bootstrap(() => App(bookshelfRepository: bookshelfRepository));
 }

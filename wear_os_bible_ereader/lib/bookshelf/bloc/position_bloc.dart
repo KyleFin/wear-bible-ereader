@@ -1,10 +1,13 @@
-import 'package:bloc/bloc.dart';
 import 'package:bookshelf_repository/bookshelf_repository.dart';
 import 'package:equatable/equatable.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
+// ignore: depend_on_referenced_packages
+import 'package:json_annotation/json_annotation.dart';
 
 part 'position_state.dart';
+part 'position_bloc.g.dart';
 
-class PositionCubit extends Cubit<PositionState> {
+class PositionCubit extends HydratedCubit<PositionState> {
   PositionCubit(this.bookshelfRepository)
       : super(const PositionState.initial());
 
@@ -127,6 +130,22 @@ class PositionCubit extends Cubit<PositionState> {
   @override
   Future<void> close() async {
     await super.close();
+  }
+
+  @override
+  PositionState fromJson(Map<String, dynamic> json) =>
+      PositionState.fromJson(json);
+
+  @override
+  Map<String, dynamic> toJson(PositionState state) => state.toJson();
+
+  /// Returns filename for reading from asset or bookRepository.
+  String? get bookFilename {
+    final title = state.bookTitle;
+    return title == null
+        ? null
+        : (titleToFilename[title] ??
+            bookshelfRepository.titlesAndFilepaths[title])!;
   }
 }
 
