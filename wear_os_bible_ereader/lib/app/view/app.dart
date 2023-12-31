@@ -80,7 +80,10 @@ class _EpubAppState extends State<EpubApp> {
       theme: ThemeData(
         visualDensity: VisualDensity.compact,
         useMaterial3: true,
-        colorScheme: const ColorScheme.dark(primary: Colors.white),
+        colorScheme: const ColorScheme.dark(
+          primary: Colors.white,
+          background: Colors.black,
+        ),
         appBarTheme: const AppBarTheme(color: Color.fromARGB(255, 9, 26, 34)),
       ),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
