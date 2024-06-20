@@ -1,5 +1,6 @@
 part of 'position_bloc.dart';
 
+@JsonSerializable()
 class PositionState extends Equatable {
   const PositionState(
     this.bookTitle,
@@ -19,6 +20,14 @@ class PositionState extends Equatable {
           latestBookFilename: bibleFilename,
           loadingDocument: false,
         );
+
+  /// Connect the generated [_$PositionStateFromJson] function to the `fromJson`
+  /// factory.
+  factory PositionState.fromJson(Map<String, dynamic> json) =>
+      _$PositionStateFromJson(json);
+
+  /// Connect the generated [_$PositionStateToJson] function to the `toJson` method.
+  Map<String, dynamic> toJson() => _$PositionStateToJson(this);
 
   /// Latest epub file which was loaded in Epub controller.
   ///
