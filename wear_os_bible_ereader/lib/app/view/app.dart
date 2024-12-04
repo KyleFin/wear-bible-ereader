@@ -82,7 +82,7 @@ class _EpubAppState extends State<EpubApp> {
         useMaterial3: true,
         colorScheme: const ColorScheme.dark(
           primary: Colors.white,
-          background: Colors.black,
+          surface: Colors.black,
         ),
         appBarTheme: const AppBarTheme(color: Color.fromARGB(255, 9, 26, 34)),
       ),
@@ -232,7 +232,7 @@ class _BookDetailsState extends State<_BookDetails> {
           _EpubViewWithTapToScroll(epubController: widget.epubController),
           if (context.read<PositionCubit>().state.chapterIndex == null) ...[
             Container(
-              color: Theme.of(context).colorScheme.background,
+              color: Theme.of(context).colorScheme.surface,
             ),
             TableOfContents(epubController: widget.epubController),
           ],
@@ -417,7 +417,7 @@ class ScriptureSelectionMenu extends StatelessWidget {
                     controller: scrollController,
                     children: () {
                       final chaptersInBook = <Widget>[
-                        ..._scriptureChaptersSpacerRow
+                        ..._scriptureChaptersSpacerRow,
                       ];
                       var i = cubit.state.scriptureBookIndex! + 1;
                       var foundNextBook = false;
