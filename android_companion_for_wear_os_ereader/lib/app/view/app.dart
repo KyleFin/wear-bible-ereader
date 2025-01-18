@@ -33,6 +33,13 @@ class AppView extends StatelessWidget {
           seedColor: const Color(0xFFFFF380),
         ),
       ),
+      darkTheme: ThemeData(
+        appBarTheme: const AppBarTheme(color: Color(0xFF333333)),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF333333),
+          brightness: Brightness.dark,
+        ),
+      ),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: const TransferPage(),
