@@ -48,7 +48,7 @@ android {
     defaultConfig {
         applicationId "com.finlinson.wear_os_bible_ereader"
         minSdkVersion 30
-        targetSdkVersion 34
+        targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
