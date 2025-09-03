@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:bookshelf_repository/bookshelf_repository.dart';
 import 'package:epub_view/epub_view.dart';
@@ -163,24 +164,29 @@ class BookDetailsPage extends StatelessWidget {
           padding: const EdgeInsets.all(8),
           child: Stack(
             children: [
-              BlocBuilder<PositionCubit, PositionState>(
-                builder: (context, state) {
-                  return state.loadingDocument
-                      ? Text('Loading ${state.bookTitle}')
-                      : GestureDetector(
-                          onDoubleTap: () => context
-                              .read<SettingsCubit>()
-                              .toggleAppBarIsVisible(),
-                          child: _BookDetails(epubController: epubController),
-                        );
-                },
+              Transform.rotate(
+                angle:
+                    context.watch<SettingsCubit>().state.rotation * 2 * math.pi,
+                child: BlocBuilder<PositionCubit, PositionState>(
+                  builder: (context, state) {
+                    return state.loadingDocument
+                        ? Text('Loading ${state.bookTitle}')
+                        : GestureDetector(
+                            onDoubleTap: () => context
+                                .read<SettingsCubit>()
+                                .toggleAppBarIsVisible(),
+                            child: _BookDetails(epubController: epubController),
+                          );
+                  },
+                ),
               ),
-              CircularSlider(
-                value: context.watch<SettingsCubit>().state.rotation,
-                onChanged: (value) {
-                  context.read<SettingsCubit>().setRotation(value);
-                },
-              ),
+              if (context.watch<SettingsCubit>().state.appBarIsVisible)
+                CircularSlider(
+                  value: context.watch<SettingsCubit>().state.rotation,
+                  onChanged: (value) {
+                    context.read<SettingsCubit>().setRotation(value);
+                  },
+                ),
             ],
           ),
         ),

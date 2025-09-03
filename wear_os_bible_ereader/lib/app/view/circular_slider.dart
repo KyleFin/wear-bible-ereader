@@ -18,6 +18,7 @@ class _CircularSliderState extends State<CircularSlider> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      behavior: HitTestBehavior.translucent,
       onPanStart: (details) {
         final center = Offset(
           context.size!.width / 2,
@@ -35,18 +36,18 @@ class _CircularSliderState extends State<CircularSlider> {
           // Adjust the distance as needed
           _isDragging = true;
         } else {
-          _isDragging = true;
-          // If not on the thumb, still start dragging but set the value based on the initial touch
-          var angle = math.atan2(
-            touchPosition.dy - center.dy,
-            touchPosition.dx - center.dx,
-          );
-          if (angle < -math.pi / 2) {
-            angle += 2 * math.pi;
-          }
-          var newValue = (angle + math.pi / 2) / (2 * math.pi);
-          newValue = newValue.clamp(0.0, 1.0);
-          widget.onChanged(newValue);
+          // _isDragging = true;
+          // // If not on the thumb, still start dragging but set the value based on the initial touch
+          // var angle = math.atan2(
+          //   touchPosition.dy - center.dy,
+          //   touchPosition.dx - center.dx,
+          // );
+          // if (angle < -math.pi / 2) {
+          //   angle += 2 * math.pi;
+          // }
+          // var newValue = (angle + math.pi / 2) / (2 * math.pi);
+          // newValue = newValue.clamp(0.0, 1.0);
+          // widget.onChanged(newValue);
         }
       },
       onPanUpdate: (details) {
@@ -71,9 +72,11 @@ class _CircularSliderState extends State<CircularSlider> {
       onPanEnd: (details) {
         _isDragging = false;
       },
-      child: CustomPaint(
-        size: const Size(200, 200),
-        painter: _CircularSliderPainter(widget.value),
+      child: IgnorePointer(
+        child: CustomPaint(
+          size: const Size(200, 200),
+          painter: _CircularSliderPainter(widget.value),
+        ),
       ),
     );
   }
