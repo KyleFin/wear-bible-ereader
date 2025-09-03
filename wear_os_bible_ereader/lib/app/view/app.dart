@@ -5,6 +5,7 @@ import 'package:epub_view/epub_view.dart';
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wear_os_bible_ereader/app/view/circular_slider.dart';
 import 'package:wear_os_bible_ereader/app/view/rotary_scrollable.dart';
 import 'package:wear_os_bible_ereader/bookshelf/bloc/settings_cubit.dart';
 import 'package:wear_os_bible_ereader/bookshelf/bookshelf.dart';
@@ -84,7 +85,8 @@ class _EpubAppState extends State<EpubApp> {
           primary: Colors.white,
           surface: Colors.black,
         ),
-        appBarTheme: const AppBarTheme(color: Color.fromARGB(255, 9, 26, 34)),
+        appBarTheme:
+            const AppBarTheme(backgroundColor: Color.fromARGB(255, 9, 26, 34)),
       ),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
@@ -159,16 +161,27 @@ class BookDetailsPage extends StatelessWidget {
         appBar: const _AnimatedAppBar(),
         body: Padding(
           padding: const EdgeInsets.all(8),
-          child: BlocBuilder<PositionCubit, PositionState>(
-            builder: (context, state) {
-              return state.loadingDocument
-                  ? Text('Loading ${state.bookTitle}')
-                  : GestureDetector(
-                      onDoubleTap: () =>
-                          context.read<SettingsCubit>().toggleAppBarIsVisible(),
-                      child: _BookDetails(epubController: epubController),
-                    );
-            },
+          child: Stack(
+            children: [
+              BlocBuilder<PositionCubit, PositionState>(
+                builder: (context, state) {
+                  return state.loadingDocument
+                      ? Text('Loading ${state.bookTitle}')
+                      : GestureDetector(
+                          onDoubleTap: () => context
+                              .read<SettingsCubit>()
+                              .toggleAppBarIsVisible(),
+                          child: _BookDetails(epubController: epubController),
+                        );
+                },
+              ),
+              CircularSlider(
+                value: context.watch<SettingsCubit>().state.rotation,
+                onChanged: (value) {
+                  context.read<SettingsCubit>().setRotation(value);
+                },
+              ),
+            ],
           ),
         ),
       ),

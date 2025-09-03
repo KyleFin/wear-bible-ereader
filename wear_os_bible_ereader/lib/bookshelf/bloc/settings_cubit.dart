@@ -7,6 +7,20 @@ class SettingsCubit extends Cubit<SettingsState> {
   SettingsCubit() : super(const SettingsState());
 
   Future<void> toggleAppBarIsVisible() async {
-    emit(SettingsState(appBarIsVisible: !state.appBarIsVisible));
+    emit(
+      SettingsState(
+        appBarIsVisible: !state.appBarIsVisible,
+        rotation: state.rotation,
+      ),
+    );
+  }
+
+  Future<void> setRotation(double rotation) async {
+    emit(
+      SettingsState(
+        appBarIsVisible: state.appBarIsVisible,
+        rotation: rotation,
+      ),
+    );
   }
 }
