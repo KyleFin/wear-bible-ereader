@@ -7,31 +7,31 @@ environment:
   sdk: ">=3.0.2 <4.0.0"
 
 dependencies:
-  bloc: ^8.1.1
+  bloc: ^9.0.0
   bookshelf_repository:
     path: ../packages/bookshelf_repository
   epub_view: ^3.2.0
   equatable: ^2.0.5
-  flow_builder: ^0.0.9
+  flow_builder: ^0.1.0
   flutter:
     sdk: flutter
-  flutter_bloc: ^8.1.2
+  flutter_bloc: ^9.1.1
   flutter_localizations:
     sdk: flutter
-  intl: ^0.19.0
+  intl: ^0.20.2
   meta: ^1.9.1
-  rotary_scrollbar: ^0.1.1
+  rotary_scrollbar: ^1.1.0
   wear: ^1.1.0
   wearable_rotary: ^2.0.0
 
 dev_dependencies:
-  bloc_test: ^9.1.1
+  bloc_test: ^10.0.0
   flutter_launcher_icons: ^0.11.0
   flutter_native_splash: ^2.2.15
   flutter_test:
     sdk: flutter
-  mocktail: ^0.3.0
-  very_good_analysis: ^5.0.0
+  mocktail: ^1.0.4
+  very_good_analysis: ^9.0.0
 
 flutter:
   assets:
