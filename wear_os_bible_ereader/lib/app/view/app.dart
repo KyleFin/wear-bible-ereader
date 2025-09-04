@@ -7,6 +7,7 @@ import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wear_os_bible_ereader/app/view/circular_slider.dart';
+import 'package:wear_os_bible_ereader/app/view/constants.dart';
 import 'package:wear_os_bible_ereader/app/view/rotary_scrollable.dart';
 import 'package:wear_os_bible_ereader/bookshelf/bloc/settings_cubit.dart';
 import 'package:wear_os_bible_ereader/bookshelf/bookshelf.dart';
@@ -86,8 +87,7 @@ class _EpubAppState extends State<EpubApp> {
           primary: Colors.white,
           surface: Colors.black,
         ),
-        appBarTheme:
-            const AppBarTheme(backgroundColor: Color.fromARGB(255, 9, 26, 34)),
+        appBarTheme: const AppBarTheme(backgroundColor: appBarBackgroundColor),
       ),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
@@ -181,11 +181,14 @@ class BookDetailsPage extends StatelessWidget {
                 ),
               ),
               if (context.watch<SettingsCubit>().state.appBarIsVisible)
-                CircularSlider(
-                  value: context.watch<SettingsCubit>().state.rotation,
-                  onChanged: (value) {
-                    context.read<SettingsCubit>().setRotation(value);
-                  },
+                Transform.rotate(
+                  angle: math.pi,
+                  child: CircularSlider(
+                    value: context.watch<SettingsCubit>().state.rotation,
+                    onChanged: (value) {
+                      context.read<SettingsCubit>().setRotation(value);
+                    },
+                  ),
                 ),
             ],
           ),

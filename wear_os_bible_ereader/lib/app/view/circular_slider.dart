@@ -90,27 +90,28 @@ class _CircularSliderPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = math.min(size.width, size.height) / 2;
     final trackPaint = Paint()
-      ..color = Colors.grey.shade300
+      ..color = const Color.fromRGBO(244, 244, 244, 0.2)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 10;
-    final progressPaint = Paint()
-      ..color = Colors.blue
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 10
-      ..strokeCap = StrokeCap.round;
+    // final progressPaint = Paint()
+    //   ..color = Colors.blue
+    //   ..style = PaintingStyle.stroke
+    //   ..strokeWidth = 10
+    //   ..strokeCap = StrokeCap.round;
     canvas.drawCircle(center, radius, trackPaint);
     const startAngle = -math.pi / 2;
     final sweepAngle = 2 * math.pi * value;
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      startAngle,
-      sweepAngle,
-      false,
-      progressPaint,
-    );
+    // canvas.drawArc(
+    //   Rect.fromCircle(center: center, radius: radius),
+    //   startAngle,
+    //   sweepAngle,
+    //   false,
+    //   progressPaint,
+    // );
     final thumbX = center.dx + radius * math.cos(startAngle + sweepAngle);
     final thumbY = center.dy + radius * math.sin(startAngle + sweepAngle);
-    final thumbPaint = Paint()..color = Colors.blue;
+    final thumbPaint = Paint()
+      ..color = const Color.fromARGB(255, 255, 255, 255);
     canvas.drawCircle(Offset(thumbX, thumbY), 12, thumbPaint);
   }
 
