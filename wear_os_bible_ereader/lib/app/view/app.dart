@@ -157,6 +157,7 @@ class BookDetailsPage extends StatelessWidget {
         context.watch<SettingsCubit>().state.rotation * 2 * math.pi;
     final horizontalPadding =
         context.watch<SettingsCubit>().state.horizontalPadding;
+    final positionState = context.watch<PositionCubit>().state;
     return WillPopScope(
       onWillPop: () async {
         return context.read<PositionCubit>().popMenu();
@@ -164,7 +165,12 @@ class BookDetailsPage extends StatelessWidget {
       child: Scaffold(
         appBar: const _AnimatedAppBar(),
         body: Padding(
-          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+          padding: EdgeInsets.symmetric(
+            horizontal: positionState.scriptureBookIndex == null ||
+                    positionState.chapterIsSelected
+                ? horizontalPadding
+                : 0,
+          ),
           child: Stack(
             alignment: Alignment.center,
             children: [
