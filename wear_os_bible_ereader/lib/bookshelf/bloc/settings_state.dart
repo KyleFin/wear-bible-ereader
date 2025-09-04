@@ -4,8 +4,8 @@ part of 'settings_cubit.dart';
 class SettingsState {
   const SettingsState({
     this.appBarIsVisible = false,
-    this.rotation = 0.0,
-    this.horizontalPadding = 7.0,
+    this.rotation = 0,
+    this.horizontalPadding = 24,
   });
 
   final bool appBarIsVisible;

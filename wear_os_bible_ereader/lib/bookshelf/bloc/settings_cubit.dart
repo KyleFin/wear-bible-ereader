@@ -37,7 +37,7 @@ class SettingsCubit extends Cubit<SettingsState> {
       SettingsState(
         appBarIsVisible: state.appBarIsVisible,
         rotation: state.rotation,
-        horizontalPadding: width.clamp(0, 50),
+        horizontalPadding: width.clamp(0, 30),
       ),
     );
   }

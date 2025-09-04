@@ -316,7 +316,14 @@ class _EpubViewWithTapToScroll extends StatelessWidget {
     return Stack(
       alignment: Alignment.center,
       children: [
-        EpubView(controller: epubController),
+        EpubView(
+          controller: epubController,
+          builders: const EpubViewBuilders<DefaultBuilderOptions>(
+            options: DefaultBuilderOptions(
+              paragraphPadding: EdgeInsetsGeometry.zero,
+            ),
+          ),
+        ),
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
