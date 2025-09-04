@@ -153,7 +153,10 @@ class BookDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final rotation =
+        context.watch<SettingsCubit>().state.rotation * 2 * math.pi;
+    final horizontalPadding =
+        context.watch<SettingsCubit>().state.horizontalPadding;
     return WillPopScope(
       onWillPop: () async {
         return context.read<PositionCubit>().popMenu();
@@ -161,12 +164,12 @@ class BookDetailsPage extends StatelessWidget {
       child: Scaffold(
         appBar: const _AnimatedAppBar(),
         body: Padding(
-          padding: const EdgeInsets.all(8),
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           child: Stack(
+            alignment: Alignment.center,
             children: [
               Transform.rotate(
-                angle:
-                    context.watch<SettingsCubit>().state.rotation * 2 * math.pi,
+                angle: rotation,
                 child: BlocBuilder<PositionCubit, PositionState>(
                   builder: (context, state) {
                     return state.loadingDocument
@@ -180,16 +183,54 @@ class BookDetailsPage extends StatelessWidget {
                   },
                 ),
               ),
-              if (context.watch<SettingsCubit>().state.appBarIsVisible)
-                Transform.rotate(
-                  angle: math.pi,
-                  child: CircularSlider(
-                    value: context.watch<SettingsCubit>().state.rotation,
-                    onChanged: (value) {
-                      context.read<SettingsCubit>().setRotation(value);
-                    },
+              if (context.watch<SettingsCubit>().state.appBarIsVisible) ...[
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Transform.rotate(
+                    angle: math.pi,
+                    child: CircularSlider(
+                      value: context.watch<SettingsCubit>().state.rotation,
+                      onChanged: (value) {
+                        context.read<SettingsCubit>().setRotation(value);
+                      },
+                    ),
                   ),
                 ),
+                Transform.rotate(
+                  angle: rotation,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextButton(
+                        child: const Row(
+                          children: [
+                            Icon(Icons.arrow_left),
+                            Icon(Icons.arrow_right),
+                          ],
+                        ),
+                        onPressed: () {
+                          context
+                              .read<SettingsCubit>()
+                              .decrementHorizontalPadding();
+                        },
+                      ),
+                      TextButton(
+                        child: const Row(
+                          children: [
+                            Icon(Icons.arrow_right),
+                            Icon(Icons.arrow_left),
+                          ],
+                        ),
+                        onPressed: () {
+                          context
+                              .read<SettingsCubit>()
+                              .incrementHorizontalPadding();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ],
           ),
         ),
