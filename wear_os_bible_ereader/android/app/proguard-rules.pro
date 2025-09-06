@@ -1,0 +1,2 @@
+-dontwarn com.google.android.wearable.compat.WearableActivityController$AmbientCallback
+-dontwarn com.google.android.wearable.compat.WearableActivityController
