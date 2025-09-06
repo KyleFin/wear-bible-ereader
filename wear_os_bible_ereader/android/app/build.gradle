@@ -29,6 +29,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
+    namespace "com.finlinson.wear_os_bible_ereader"
     compileSdkVersion flutter.compileSdkVersion
 
     compileOptions {
@@ -47,7 +48,7 @@ android {
     defaultConfig {
         applicationId "com.finlinson.wear_os_bible_ereader"
         minSdkVersion 30
-        targetSdkVersion 33
+        targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }

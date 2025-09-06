@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:bookshelf_repository/bookshelf_repository.dart';
 import 'package:epub_view/epub_view.dart';
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wear_os_bible_ereader/app/view/circular_slider.dart';
+import 'package:wear_os_bible_ereader/app/view/constants.dart';
 import 'package:wear_os_bible_ereader/app/view/rotary_scrollable.dart';
 import 'package:wear_os_bible_ereader/bookshelf/bloc/settings_cubit.dart';
 import 'package:wear_os_bible_ereader/bookshelf/bookshelf.dart';
@@ -84,7 +87,7 @@ class _EpubAppState extends State<EpubApp> {
           primary: Colors.white,
           surface: Colors.black,
         ),
-        appBarTheme: const AppBarTheme(color: Color.fromARGB(255, 9, 26, 34)),
+        appBarTheme: const AppBarTheme(backgroundColor: appBarBackgroundColor),
       ),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
@@ -150,7 +153,11 @@ class BookDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final rotation =
+        context.watch<SettingsCubit>().state.rotation * 2 * math.pi;
+    final horizontalPadding =
+        context.watch<SettingsCubit>().state.horizontalPadding;
+    final positionState = context.watch<PositionCubit>().state;
     return WillPopScope(
       onWillPop: () async {
         return context.read<PositionCubit>().popMenu();
@@ -158,17 +165,79 @@ class BookDetailsPage extends StatelessWidget {
       child: Scaffold(
         appBar: const _AnimatedAppBar(),
         body: Padding(
-          padding: const EdgeInsets.all(8),
-          child: BlocBuilder<PositionCubit, PositionState>(
-            builder: (context, state) {
-              return state.loadingDocument
-                  ? Text('Loading ${state.bookTitle}')
-                  : GestureDetector(
-                      onDoubleTap: () =>
-                          context.read<SettingsCubit>().toggleAppBarIsVisible(),
-                      child: _BookDetails(epubController: epubController),
-                    );
-            },
+          padding: EdgeInsets.symmetric(
+            horizontal: positionState.scriptureBookIndex == null ||
+                    positionState.chapterIsSelected
+                ? horizontalPadding
+                : 0,
+          ),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Transform.rotate(
+                angle: rotation,
+                child: BlocBuilder<PositionCubit, PositionState>(
+                  builder: (context, state) {
+                    return state.loadingDocument
+                        ? Text('Loading ${state.bookTitle}')
+                        : GestureDetector(
+                            onDoubleTap: () => context
+                                .read<SettingsCubit>()
+                                .toggleAppBarIsVisible(),
+                            child: _BookDetails(epubController: epubController),
+                          );
+                  },
+                ),
+              ),
+              if (context.watch<SettingsCubit>().state.appBarIsVisible) ...[
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Transform.rotate(
+                    angle: math.pi,
+                    child: CircularSlider(
+                      value: context.watch<SettingsCubit>().state.rotation,
+                      onChanged: (value) {
+                        context.read<SettingsCubit>().setRotation(value);
+                      },
+                    ),
+                  ),
+                ),
+                Transform.rotate(
+                  angle: rotation,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextButton(
+                        child: const Row(
+                          children: [
+                            Icon(Icons.arrow_left),
+                            Icon(Icons.arrow_right),
+                          ],
+                        ),
+                        onPressed: () {
+                          context
+                              .read<SettingsCubit>()
+                              .decrementHorizontalPadding();
+                        },
+                      ),
+                      TextButton(
+                        child: const Row(
+                          children: [
+                            Icon(Icons.arrow_right),
+                            Icon(Icons.arrow_left),
+                          ],
+                        ),
+                        onPressed: () {
+                          context
+                              .read<SettingsCubit>()
+                              .incrementHorizontalPadding();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
           ),
         ),
       ),
@@ -253,7 +322,14 @@ class _EpubViewWithTapToScroll extends StatelessWidget {
     return Stack(
       alignment: Alignment.center,
       children: [
-        EpubView(controller: epubController),
+        EpubView(
+          controller: epubController,
+          builders: const EpubViewBuilders<DefaultBuilderOptions>(
+            options: DefaultBuilderOptions(
+              paragraphPadding: EdgeInsetsGeometry.zero,
+            ),
+          ),
+        ),
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
