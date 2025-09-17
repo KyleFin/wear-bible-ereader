@@ -9,6 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wear_os_bible_ereader/app/view/circular_slider.dart';
 import 'package:wear_os_bible_ereader/app/view/constants.dart';
 import 'package:wear_os_bible_ereader/app/view/rotary_scrollable.dart';
+import 'package:wear_os_bible_ereader/app/view/round_ratio_scrollbar.dart';
 import 'package:wear_os_bible_ereader/bookshelf/bloc/settings_cubit.dart';
 import 'package:wear_os_bible_ereader/bookshelf/bookshelf.dart';
 import 'package:wear_os_bible_ereader/l10n/l10n.dart';
@@ -299,6 +300,12 @@ class _BookDetailsState extends State<_BookDetails> {
           // well having an EpubView always in the widget tree (even
           // if it's not visible).
           _EpubViewWithTapToScroll(epubController: widget.epubController),
+          const RoundRatioScrollbar(
+            currentIndex: 4,
+            totalIndices: 10,
+            autoHide: false,
+            child: SizedBox.expand(),
+          ),
           if (context.read<PositionCubit>().state.chapterIndex == null) ...[
             Container(
               color: Theme.of(context).colorScheme.surface,
