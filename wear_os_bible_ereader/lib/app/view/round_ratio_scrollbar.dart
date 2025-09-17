@@ -1,12 +1,11 @@
 import 'dart:async';
-
-import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
-import 'package:rotary_scrollbar/rotary_scrollbar.dart' show RotaryScrollbar;
+import 'package:flutter/material.dart';
 
-import 'package:rotary_scrollbar/widgets/rotary_scrollbar.dart'
-    show RotaryScrollbar;
+/// Copied from RotaryScrollbar package.
+/// Shows scrollbar with specific ratio instead of depending on scrollController
+/// because epub_view's ScrollablePositionedList doesn't expose controller.
 
 // Defines the starting point of the progress bar arc on the screen.
 // This is equivalent to the 2 o'clock position on an analog clock.
@@ -19,22 +18,16 @@ const _kProgressBarLength = math.pi / 3;
 /// A curved scrollbar designed for circular Wear OS screens.
 ///
 /// This widget provides a visually appealing and intuitive scrollbar that
-/// follows the curvature of round displays. It's designed to work seamlessly
-/// with scrollable views like `PageView`, `ListView`, and others. The scrollbar
-/// can be controlled through touch gestures on the scrollable content.
-///
-/// See also:
-///
-///  * [RotaryScrollbar], a similar scrollbar that also responds to rotary
-/// input events from devices with rotating bezels or crowns.
-class RoundScrollbar extends StatefulWidget {
-  /// Creates a [RoundScrollbar].
+/// follows the curvature of round displays.
+class RoundRatioScrollbar extends StatefulWidget {
+  /// Creates a [RoundRatioScrollbar].
   ///
   /// The [child] parameter is required and represents the scrollable widget
   /// that the scrollbar will control.
-  const RoundScrollbar({
+  const RoundRatioScrollbar({
     required this.child,
-    this.controller,
+    required this.currentIndex,
+    required this.totalIndices,
     this.padding = 8,
     this.width = 8,
     this.autoHide = true,
@@ -52,7 +45,9 @@ class RoundScrollbar extends StatefulWidget {
   /// If not provided, it defaults to the [PrimaryScrollController] in the
   /// current [BuildContext]. This fallback is useful in many typical scenarios
   /// where a single, primary scrollable area exists within a given context.
-  final ScrollController? controller;
+  final double? currentIndex;
+
+  final double totalIndices;
 
   /// The padding around the scrollbar track.
   ///
@@ -123,10 +118,8 @@ class RoundScrollbar extends StatefulWidget {
   State<StatefulWidget> createState() => _RoundScrollbarState();
 }
 
-class _RoundScrollbarState extends State<RoundScrollbar>
+class _RoundScrollbarState extends State<RoundRatioScrollbar>
     with SingleTickerProviderStateMixin {
-  ScrollController? _currentController;
-
   late final _RoundProgressBarPainter _painter;
 
   late final AnimationController _opacityController;
@@ -135,39 +128,22 @@ class _RoundScrollbarState extends State<RoundScrollbar>
   Timer? _fadeOutTimer;
 
   void _onScroll() {
-    final controller = _currentController;
-    if (controller == null ||
-        !controller.position.hasViewportDimension ||
-        controller.position.extentInside == controller.position.extentTotal) {
-      return;
-    }
-    _updateScrollbarPainter(controller);
+    _updateScrollbarPainter();
     if (!_opacityController.isAnimating) _opacityController.forward();
     _maybeHideAfterDelay();
   }
 
-  double? _viewPortDimensions;
+  void _updateScrollbarPainter() {
+    // final thumbFraction = 1 /
+    //     ((controller.position.maxScrollExtent /
+    //             controller.position.viewportDimension) +
+    //         1);
+    // final index = controller.offset / controller.position.viewportDimension;
 
-  bool _onScrollMetricsChange(ScrollMetricsNotification notification) {
-    if (!notification.metrics.hasViewportDimension ||
-        !notification.metrics.hasContentDimensions ||
-        _viewPortDimensions == notification.metrics.viewportDimension) {
-      return false;
-    }
-    _onScroll();
-    _viewPortDimensions = notification.metrics.viewportDimension;
-
-    return false;
-  }
-
-  void _updateScrollbarPainter(ScrollController controller) {
-    final thumbFraction = 1 /
-        ((controller.position.maxScrollExtent /
-                controller.position.viewportDimension) +
-            1);
-    final index = controller.offset / controller.position.viewportDimension;
-
-    _painter.updateThumb(index, thumbFraction);
+    _painter.updateThumb(
+      (widget.currentIndex ?? 0) / widget.totalIndices,
+      1 / widget.totalIndices,
+    );
   }
 
   void _maybeHideAfterDelay() {
@@ -180,10 +156,11 @@ class _RoundScrollbarState extends State<RoundScrollbar>
   }
 
   @override
-  void didUpdateWidget(covariant RoundScrollbar oldWidget) {
+  void didUpdateWidget(covariant RoundRatioScrollbar oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.controller != widget.controller) {
-      _updateController();
+    if (oldWidget.currentIndex != widget.currentIndex ||
+        oldWidget.totalIndices != widget.totalIndices) {
+      _onScroll();
     }
     if (oldWidget.opacityAnimationDuration != widget.opacityAnimationDuration) {
       _opacityController.duration = widget.opacityAnimationDuration;
@@ -197,7 +174,6 @@ class _RoundScrollbarState extends State<RoundScrollbar>
   @override
   void initState() {
     super.initState();
-    _currentController?.addListener(_onScroll);
     _opacityController = AnimationController(
       value: 0,
       vsync: this,
@@ -226,7 +202,6 @@ class _RoundScrollbarState extends State<RoundScrollbar>
   void didChangeDependencies() {
     super.didChangeDependencies();
     _updatePainter();
-    _updateController();
   }
 
   void _updatePainter() {
@@ -239,32 +214,18 @@ class _RoundScrollbarState extends State<RoundScrollbar>
           Theme.of(context).highlightColor.withAlpha(255);
   }
 
-  void _updateController() {
-    _currentController?.removeListener(_onScroll);
-    _currentController =
-        widget.controller ?? PrimaryScrollController.of(context);
-    _currentController?.addListener(_onScroll);
-  }
-
   @override
   void dispose() {
-    _currentController?.removeListener(_onScroll);
     _opacityController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return NotificationListener<ScrollMetricsNotification>(
-      onNotification: _onScrollMetricsChange,
-      child: CustomPaint(
-        foregroundPainter: _painter,
-        child: RepaintBoundary(
-          child: PrimaryScrollController(
-            controller: _currentController!,
-            child: widget.child,
-          ),
-        ),
+    return CustomPaint(
+      foregroundPainter: _painter,
+      child: RepaintBoundary(
+        child: widget.child,
       ),
     );
   }
@@ -330,14 +291,12 @@ class _RoundProgressBarPainter extends ChangeNotifier implements CustomPainter {
 
   /// Updates the thumb's position and size based on the scroll progress.
   ///
-  /// [index] represents the current scroll offset as a fraction of the viewport
-  /// size.
-  ///
-  /// [fraction] represents the size of the thumb relative to the track length.
+  /// [index] represents thumb offset relative to track length.
+  /// [fraction] represents thumb size relative to track length.
   void updateThumb(double index, double fraction) {
     thumb
       ..length = track.length * fraction
-      ..startAngle = thumb.length * index + track.startAngle;
+      ..startAngle = track.length * index + track.startAngle;
     notifyListeners();
   }
 
@@ -379,14 +338,15 @@ class _RoundProgressBarPainter extends ChangeNotifier implements CustomPainter {
     // Calculates the inner dimensions of the scrollbar track, excluding padding and width.
     final innerWidth = size.width - trackPadding * 2 - trackWidth;
     final innerHeight = size.height - trackPadding * 2 - trackWidth;
+    final radius = math.min(innerHeight, innerWidth);
 
     // Creates a Rect that defines the bounds of the track, centered within the widget.
     final path = Path()
       ..arcTo(
         Rect.fromCenter(
           center: centerOffset,
-          width: innerWidth,
-          height: innerHeight,
+          width: radius,
+          height: radius,
         ),
         part.startAngle,
         part.length,
