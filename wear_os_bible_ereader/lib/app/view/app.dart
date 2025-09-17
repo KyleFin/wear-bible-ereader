@@ -300,12 +300,24 @@ class _BookDetailsState extends State<_BookDetails> {
           // well having an EpubView always in the widget tree (even
           // if it's not visible).
           _EpubViewWithTapToScroll(epubController: widget.epubController),
-          const RoundRatioScrollbar(
-            currentIndex: 4,
-            totalIndices: 10,
-            autoHide: false,
-            child: SizedBox.expand(),
+          // PATCH-OUT start?
+          FutureBuilder(
+            future: widget.epubController.document,
+            builder: (context, snapshot) => ValueListenableBuilder(
+              valueListenable: widget.epubController.currentValueListenable,
+              builder: (context, value, child) {
+                return RoundRatioScrollbar(
+                  // chapterNumber is actual index, progress detects scroll
+                  currentIndex: (value?.chapterNumber ?? 0) +
+                      (0.00001 * (value?.progress ?? 1)),
+                  totalIndices:
+                      snapshot.data?.Content?.Html?.length.toDouble() ?? 1.0,
+                  child: const SizedBox.expand(),
+                );
+              },
+            ),
           ),
+          // PATCH-OUT end?
           if (context.read<PositionCubit>().state.chapterIndex == null) ...[
             Container(
               color: Theme.of(context).colorScheme.surface,
