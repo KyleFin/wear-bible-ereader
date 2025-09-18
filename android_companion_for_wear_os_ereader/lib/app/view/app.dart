@@ -1,4 +1,4 @@
-import 'package:android_companion_for_wear_os_ereader/l10n/l10n.dart';
+import 'package:android_companion_for_wear_os_ereader/l10n/arb/app_localizations.dart';
 import 'package:android_companion_for_wear_os_ereader/transfer/transfer.dart';
 import 'package:bookshelf_repository/bookshelf_repository.dart';
 import 'package:flutter/material.dart';
@@ -28,13 +28,13 @@ class AppView extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        appBarTheme: const AppBarTheme(color: Color(0xFFFFF380)),
+        appBarTheme: const AppBarTheme(backgroundColor: Color(0xFFFFF380)),
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFFFFF380),
         ),
       ),
       darkTheme: ThemeData(
-        appBarTheme: const AppBarTheme(color: Color(0xFF333333)),
+        appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF333333)),
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF333333),
           brightness: Brightness.dark,
