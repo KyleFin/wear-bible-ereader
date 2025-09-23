@@ -5,7 +5,7 @@ class SettingsState {
   const SettingsState({
     this.appBarIsVisible = false,
     this.rotation = 0,
-    this.horizontalPadding = 24,
+    this.horizontalPadding = 6,
   });
 
   final bool appBarIsVisible;
